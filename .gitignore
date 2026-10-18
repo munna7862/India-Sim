@@ -29,6 +29,7 @@ dist/
 .godot/
 *.translation
 export_presets.cfg
+tools/godot/
 
 # --- OS & Environment ---
 .DS_Store

@@ -69,13 +69,46 @@ if ($LASTEXITCODE -ne 0) {
     Write-Error "ContentValidator publish failed with exit code $LASTEXITCODE"
 }
 
-# 4. Copy Game Content Data
-Write-Host "`n[4/6] Bundling Game Content Data..." -ForegroundColor Yellow
+# 4. Bundle Standalone Desktop Executable (Rashtra.exe) & Engine Runtime
+Write-Host "`n[4/7] Bundling Standalone Desktop Executable (Rashtra.exe)..." -ForegroundColor Yellow
+
+$GodotExeSource = Join-Path $RootDir "tools\godot\extracted\Godot_v4.3-stable_mono_win64\Godot_v4.3-stable_mono_win64.exe"
+$GodotSharpSource = Join-Path $RootDir "tools\godot\extracted\Godot_v4.3-stable_mono_win64\GodotSharp"
+
+if (-not (Test-Path $GodotExeSource)) {
+    Write-Host "Downloading Godot 4.3 Mono Windows runtime..." -ForegroundColor Cyan
+    $GodotDir = Join-Path $RootDir "tools\godot"
+    New-Item -ItemType Directory -Path $GodotDir -Force | Out-Null
+    $ZipTarget = Join-Path $GodotDir "godot_mono.zip"
+    curl.exe -L -o $ZipTarget "https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_mono_win64.zip"
+    Expand-Archive -Path $ZipTarget -DestinationPath (Join-Path $GodotDir "extracted") -Force
+}
+
+# Copy Standalone Executable to Root of Distribution
+Copy-Item -Path $GodotExeSource -Destination (Join-Path $PackageDir "Rashtra.exe") -Force
+Copy-Item -Path $GodotSharpSource -Destination (Join-Path $PackageDir "GodotSharp") -Recurse -Force
+
+# Create convenient one-click launcher
+$LauncherBat = Join-Path $PackageDir "Play-Rashtra.bat"
+"@echo off`r`ntitle Rashtra: Sovereign Republic`r`nstart `"`" `"%~dp0Rashtra.exe`"`r`n" | Set-Content -Path $LauncherBat -Encoding ASCII
+
+# Bundle Desktop project configuration, scenes, and compiled assemblies
+$DesktopSource = Join-Path $RootDir "src\WorldState.Desktop"
+Copy-Item -Path (Join-Path $DesktopSource "project.godot") -Destination (Join-Path $PackageDir "project.godot") -Force
+Copy-Item -Path (Join-Path $DesktopSource "icon.svg") -Destination (Join-Path $PackageDir "icon.svg") -Force
+Copy-Item -Path (Join-Path $DesktopSource "scenes") -Destination (Join-Path $PackageDir "scenes") -Recurse -Force
+
+# Pre-compile C# solution in project to generate .godot cache
+& $GodotExeSource --headless --path $DesktopSource --build-solutions --quit
+Copy-Item -Path (Join-Path $DesktopSource ".godot") -Destination (Join-Path $PackageDir ".godot") -Recurse -Force
+
+# 5. Copy Game Content Data
+Write-Host "`n[5/7] Bundling Game Content Data..." -ForegroundColor Yellow
 $ContentDest = Join-Path $PackageDir "content"
 Copy-Item -Path "$RootDir\content" -Destination $ContentDest -Recurse -Force
 
-# 5. Copy Licenses and Documentation
-Write-Host "`n[5/6] Bundling Licenses, Guides, and Documentation..." -ForegroundColor Yellow
+# 6. Copy Licenses and Documentation
+Write-Host "`n[6/7] Bundling Licenses, Guides, and Documentation..." -ForegroundColor Yellow
 $DocsDest = Join-Path $PackageDir "docs"
 New-Item -ItemType Directory -Path $DocsDest -Force | Out-Null
 
@@ -98,8 +131,8 @@ if (Test-Path "$RootDir\RELEASE-NOTES-v1.0.0.md") {
     Copy-Item -Path "$RootDir\RELEASE-NOTES-v1.0.0.md" -Destination $PackageDir -Force
 }
 
-# 6. Generate Checksums and Zip Archive
-Write-Host "`n[6/6] Generating SHA256 Checksums and Compressing Distribution..." -ForegroundColor Yellow
+# 7. Generate Checksums and Zip Archive
+Write-Host "`n[7/7] Generating SHA256 Checksums and Compressing Distribution..." -ForegroundColor Yellow
 
 $ChecksumFile = Join-Path $PackageDir "SHA256SUMS.txt"
 $AllFiles = Get-ChildItem -Path $PackageDir -Recurse -File | Where-Object { $_.FullName -ne $ChecksumFile }
