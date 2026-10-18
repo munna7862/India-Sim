@@ -23,6 +23,7 @@ obj/
 .vs/
 .vscode/
 *.DotSettings.user
+dist/
 
 # --- Godot 4 Artifacts ---
 .godot/

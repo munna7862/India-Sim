@@ -1,15 +1,15 @@
 # Sprint State
 
 - Project: Rashtra: Sovereign Republic (Desktop Remake)
-- Status: Phase 08 completed; Ready for Phase 09.
-- Active phase: 08 (Original Graphics, Desktop Map & Visual Polish) -> COMPLETED
-- Active sprint: 08-03 (Visual regression and performance) -> COMPLETED; Next: 09-01 (Clean-room parity audit)
-- Sprint status: Completed (All 3 Phase 08 sprints completed: Original map skin & iconography, Desktop layouts & information density, Visual regression & performance; 208/208 tests green)
-- Last verified commit: Phase 08 completion
-- Last CI run: Local `.\build.ps1` execution passed (208/208 tests pass, ContentValidator verified 6 countries, 1 scenario, 1 map dataset, 8 tasks, 5 domestic events, 6 world events, 6 economic policies, 12 military units, 8 achievements, 0 warnings/errors)
+- Status: Phase 09 completed; V1.0.0 Golden Master Release Ready.
+- Active phase: 09 (Parity QA, Windows Packaging & V1 Release) -> COMPLETED
+- Active sprint: 09-03 (V1 release gate and V2 backlog capture) -> COMPLETED; Next: V1 Release Sign-off & PR
+- Sprint status: Completed (All 3 Phase 09 sprints completed: Feature parity audit and bug bash, Windows packaging & clean-machine recovery, V1 release gate & V2 backlog; 218/218 tests green)
+- Last verified commit: Phase 09 completion
+- Last CI run: Local `.\build.ps1` and `.\package.ps1` executions passed (218/218 tests pass, ContentValidator verified 6 countries, 1 scenario, 1 map dataset, 8 tasks, 5 domestic events, 6 world events, 6 economic policies, 12 military units, 8 achievements, 0 warnings/errors, standalone package and SHA256 checksums generated)
 
 ## Current objective
-Transition to Phase 09 (Verification, Release Hardening & Packaging) and execute Sprint 09-01 (Clean-room parity audit).
+Complete Phase 09, review all phase release artifacts, and raise the V1 Golden Master Pull Request.
 
 ## Blockers / decisions
 - Reference Game Access Limitation: Direct Android APK execution is not supported natively in this Windows agent environment without an emulator. Publicly verified developer documentation, store descriptions, and gameplay captures were synthesized into `REFERENCE-INVENTORY.md` and `FEATURE-PARITY-MATRIX.md`. A companion checklist (`docs/research/REFERENCE-RESEARCH-CHECKLIST.md`) is provided for the human owner to log live-session numerical coefficients.
@@ -36,6 +36,9 @@ Transition to Phase 09 (Verification, Release Hardening & Packaging) and execute
 - Map Skin, Palettes & Interactive Map (Sprint 08-01): Completed (`MapTheme.cs`, `MapPalette`, `MapThemeRegistry` with 3 palettes, stance-based diplomatic coloring, `WorldMapViewModel.cs`, `WorldMapControl.cs`, `WorldMapViewModelTests.cs`).
 - Desktop Layouts & Information Density (Sprint 08-02): Completed (`DesktopLayoutHelper.cs`, responsive tiering, task & nation filtering, hotkeys F1-F10/Space/1-3, search bars, action confirmation dialogs, `SettingsDialog.tscn` upgrades, `DesktopLayoutAndSettingsTests.cs`).
 - Visual Regression & Performance (Sprint 08-03): Completed (`MapPerformanceTests.cs` benchmark, projection caching, simulation invariants, 208/208 tests green, `build.ps1` passed).
+- Parity Audit & Bug Bash (Sprint 09-01): Completed (`ParityAuditAndReleaseTests.cs`, multi-year simulation stress test, sovereign debt crisis & recovery, wartime conflict cycle, save corrupt recovery, offline air-gap audit; 34/34 features Parity Passed).
+- Windows Packaging & Diagnostics (Sprint 09-02): Completed (`DiagnosticsService.cs`, `WindowsPackagingAndDiagnosticsTests.cs`, `package.ps1`, `CRASH-AND-DIAGNOSTICS-GUIDE.md`, `dist/Rashtra-v1.0.0-win-x64.zip`, `SHA256SUMS.txt`).
+- Release Gate & V2 Backlog (Sprint 09-03): Completed (`RELEASE-NOTES-v1.0.0.md`, `DESKTOP-CONTROLS-GUIDE.md`, `docs/V2-BACKLOG.md` with 5 prioritized domains, all 218 tests passing, 0 warnings/errors).
 - Map Data Licensing (ADR-002): Natural Earth Admin 0 Public Domain vector datasets integrated under `GEO-01`.
 - Branding & Clean-Room Policy: Resolved in Sprint 00-02 via `docs/legal/CLEAN-ROOM-POLICY.md` (Working title: "Rashtra: Sovereign Republic").
 
@@ -69,9 +72,9 @@ Transition to Phase 09 (Verification, Release Hardening & Packaging) and execute
 | 08-01 | Completed | `MapTheme.cs`, `MapPalette`, `WorldMapControl.cs`, `WorldMapViewModelTests.cs` |
 | 08-02 | Completed | `DesktopLayoutHelper.cs`, `GameShell.cs`, `CountrySelect.cs`, `SettingsDialog.cs`, `DesktopLayoutAndSettingsTests.cs` |
 | 08-03 | Completed | `MapPerformanceTests.cs`, `PHASE-08.md`, `FEATURE-PARITY-MATRIX.md`, `ASSET-AND-DATA-PROVENANCE.md` (208/208 tests pass, `build.ps1` green) |
-| 09-01 | Ready / Next | `plans/sprints/09-01.md` |
-| 09-02 | Not started | None |
-| 09-03 | Not started | None |
+| 09-01 | Completed | `ParityAuditAndReleaseTests.cs`, `docs/research/FEATURE-PARITY-MATRIX.md` (34/34 features Parity Passed, 214 tests pass) |
+| 09-02 | Completed | `DiagnosticsService.cs`, `WindowsPackagingAndDiagnosticsTests.cs`, `package.ps1`, `CRASH-AND-DIAGNOSTICS-GUIDE.md`, `SHA256SUMS.txt` (218 tests pass) |
+| 09-03 | Completed | `RELEASE-NOTES-v1.0.0.md`, `DESKTOP-CONTROLS-GUIDE.md`, `docs/V2-BACKLOG.md`, `plans/phases/PHASE-09.md` (V1.0.0 Golden Master certified) |
 
 ## Update protocol
 Record actual commands, test outcomes, screenshots/reports, commit/PR, unresolved issues and next action. Do not mark a sprint done unless acceptance criteria pass.
