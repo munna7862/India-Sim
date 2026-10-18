@@ -59,6 +59,9 @@ public static class GameInitializer
             }
         }
 
+        // Populate default tasks
+        session.Tasks = WorldState.Domain.Tasks.TaskRegistry.CreateDefaultModernTasks();
+
         return session;
     }
 }

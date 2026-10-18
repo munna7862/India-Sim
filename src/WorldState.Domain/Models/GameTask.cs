@@ -48,10 +48,28 @@ public class GameTask
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public TaskCategory Category { get; set; } = TaskCategory.Economic;
+    public bool IsPrincipal { get; set; } = false;
+    public string? PrerequisiteTaskId { get; set; }
+    public DateOnly? Deadline { get; set; }
     public GameTaskStatus Status { get; set; } = GameTaskStatus.Active;
     public List<SubTaskState> SubTasks { get; set; } = new();
     public TaskReward Reward { get; set; } = new();
     public bool IsRewardClaimed { get; set; } = false;
+
+    public double ProgressPercentage
+    {
+        get
+        {
+            if (SubTasks.Count == 0) return Status == GameTaskStatus.Completed ? 100.0 : 0.0;
+            double sum = 0.0;
+            foreach (var st in SubTasks)
+            {
+                if (st.TargetCount <= 0) sum += 100.0;
+                else sum += Math.Min(100.0, (double)st.CurrentCount / st.TargetCount * 100.0);
+            }
+            return sum / SubTasks.Count;
+        }
+    }
 
     public bool CheckCompletion()
     {

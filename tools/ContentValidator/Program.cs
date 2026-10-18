@@ -165,5 +165,65 @@ if (Directory.Exists(mapDir))
     }
 }
 
-Console.WriteLine($"\nValidation Complete: {validatedCountries} countries, {validatedScenarios} scenarios, {validatedMaps} map datasets. Errors: {errorCount}.");
+// 4. Validate Task Definitions
+string tasksDir = Path.Combine(contentDir, "tasks");
+int validatedTasks = 0;
+if (Directory.Exists(tasksDir))
+{
+    Console.WriteLine("\n--- Validating Task Definitions ---");
+    string[] taskFiles = Directory.GetFiles(tasksDir, "*.json");
+    foreach (string file in taskFiles)
+    {
+        Console.WriteLine($"Validating tasks: {Path.GetFileName(file)}...");
+        try
+        {
+            string json = File.ReadAllText(file);
+            var taskRegistry = new WorldState.Domain.Tasks.TaskRegistry();
+            taskRegistry.LoadFromJson(json);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"  [OK] Valid tasks dataset: {Path.GetFileName(file)} with {taskRegistry.Definitions.Count} task definitions.");
+            Console.ResetColor();
+            validatedTasks += taskRegistry.Definitions.Count;
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [ERROR] Task validation failure: {ex.Message}");
+            Console.ResetColor();
+            errorCount++;
+        }
+    }
+}
+
+// 5. Validate Domestic Event Definitions
+string eventsDir = Path.Combine(contentDir, "events");
+int validatedEvents = 0;
+if (Directory.Exists(eventsDir))
+{
+    Console.WriteLine("\n--- Validating Domestic Event Definitions ---");
+    string[] eventFiles = Directory.GetFiles(eventsDir, "*.json");
+    foreach (string file in eventFiles)
+    {
+        Console.WriteLine($"Validating domestic events: {Path.GetFileName(file)}...");
+        try
+        {
+            string json = File.ReadAllText(file);
+            var eventRegistry = new WorldState.Domain.Events.DomesticEventRegistry();
+            eventRegistry.LoadFromJson(json);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"  [OK] Valid events dataset: {Path.GetFileName(file)} with {eventRegistry.Events.Count} event definitions.");
+            Console.ResetColor();
+            validatedEvents += eventRegistry.Events.Count;
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [ERROR] Event validation failure: {ex.Message}");
+            Console.ResetColor();
+            errorCount++;
+        }
+    }
+}
+
+Console.WriteLine($"\nValidation Complete: {validatedCountries} countries, {validatedScenarios} scenarios, {validatedMaps} map datasets, {validatedTasks} tasks, {validatedEvents} events. Errors: {errorCount}.");
 return errorCount == 0 ? 0 : 1;

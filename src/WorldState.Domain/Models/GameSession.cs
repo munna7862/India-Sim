@@ -15,6 +15,8 @@ public class GameSession
     public List<string> ClaimedRewardIds { get; set; } = new();
     public List<TimedOperation> TimedOperations { get; set; } = new();
     public CooldownTracker Cooldowns { get; set; } = new();
+    public ActiveEventPrompt? PendingEvent { get; set; }
+    public Dictionary<string, int> EventCooldowns { get; set; } = new();
 
     public void AddEvent(GameEvent gameEvent)
     {
@@ -29,7 +31,8 @@ public class GameSession
     {
         var session = new GameSession
         {
-            PlayerCountryId = protagonistCountryId
+            PlayerCountryId = protagonistCountryId,
+            Tasks = WorldState.Domain.Tasks.TaskRegistry.CreateDefaultModernTasks()
         };
 
         var playerCountry = CountryState.CreateIndiaDefault();
