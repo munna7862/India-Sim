@@ -1,7 +1,8 @@
-using Godot;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using Godot;
 using WorldState.Domain.Data;
 using WorldState.Domain.Map;
 using WorldState.Domain.Models;
@@ -12,10 +13,12 @@ namespace WorldState.Desktop.Scenes;
 
 public partial class CountrySelect : Control
 {
-    private CountryRegistry _registry = new();
+    private readonly CountryRegistry _registry = new();
+    private WorldMapData _mapData = new();
     private CountrySelectionViewModel? _viewModel;
     private readonly ScenarioDefinition _scenario = ScenarioDefinition.CreateDefault();
 
+    private WorldMapControl? _worldMap;
     private LineEdit? _searchBox;
     private VBoxContainer? _countryListContainer;
     private Label? _countryNameLabel;
@@ -30,6 +33,7 @@ public partial class CountrySelect : Control
 
     public override void _Ready()
     {
+        _worldMap = GetNodeOrNull<WorldMapControl>("HBox/CenterMapContainer/WorldMap");
         _searchBox = GetNodeOrNull<LineEdit>("HBox/LeftPanel/SearchBox");
         _countryListContainer = GetNodeOrNull<VBoxContainer>("HBox/LeftPanel/Scroll/CountryList");
 
@@ -45,9 +49,18 @@ public partial class CountrySelect : Control
         _backBtn = GetNodeOrNull<Button>("HBox/RightPanel/ActionsBox/BackButton");
 
         InitializeRegistry();
+        InitializeMapData();
 
-        _viewModel = new CountrySelectionViewModel(_registry);
+        _viewModel = new CountrySelectionViewModel(_registry, _mapData);
         _viewModel.OnStateChanged += UpdateUi;
+
+        if (_worldMap != null)
+        {
+            var session = GameSession.CreateNewGame(_viewModel.SelectedCountry?.Id ?? "IND");
+            var mapVm = new WorldMapViewModel(_mapData, session, _registry);
+            _worldMap.Initialize(mapVm);
+            _worldMap.CountrySelected += OnCountrySelectedFromMap;
+        }
 
         if (_searchBox != null)
         {
@@ -65,6 +78,33 @@ public partial class CountrySelect : Control
         }
 
         UpdateUi();
+    }
+
+    private void OnCountrySelectedFromMap(string countryId)
+    {
+        _viewModel?.SelectCountry(countryId);
+    }
+
+    private void InitializeMapData()
+    {
+        string mapFile = Path.Combine(Directory.GetCurrentDirectory(), "content", "map", "world_countries.geojson");
+        if (!File.Exists(mapFile))
+        {
+            mapFile = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "content", "map", "world_countries.geojson");
+        }
+
+        if (File.Exists(mapFile))
+        {
+            try
+            {
+                string json = File.ReadAllText(mapFile);
+                _mapData = GeoJsonMapLoader.LoadFromJson(json);
+            }
+            catch
+            {
+                _mapData = new WorldMapData();
+            }
+        }
     }
 
     private void InitializeRegistry()
@@ -150,14 +190,21 @@ public partial class CountrySelect : Control
         {
             if (_countryNameLabel != null) _countryNameLabel.Text = $"{sel.Name} [{sel.Id}]";
             if (_capitalLabel != null) _capitalLabel.Text = $"Capital: {sel.Capital}";
-            if (_treasuryLabel != null) _treasuryLabel.Text = $"Treasury: {HudViewModel.FormatCurrency(sel.StartingTreasury)}";
-            if (_populationLabel != null) _populationLabel.Text = $"Population: {HudViewModel.FormatNumber(sel.StartingPopulation)}";
-            if (_metricsLabel != null) _metricsLabel.Text = $"Approval: {sel.StartingApproval:F1}%  •  Living Std: {sel.StartingQualityOfLiving:F1}%  •  Stability: {sel.StartingStability:F1}%";
+            if (_treasuryLabel != null) _treasuryLabel.Text = $"Starting Treasury: {HudViewModel.FormatCurrency(sel.StartingTreasury)}";
+            if (_populationLabel != null) _populationLabel.Text = $"Starting Population: {HudViewModel.FormatNumber(sel.StartingPopulation)}";
+            if (_metricsLabel != null) _metricsLabel.Text = $"Approval: {sel.StartingApproval:F1}%  •  Living Standard: {sel.StartingQualityOfLiving:F1}%  •  Stability: {sel.StartingStability:F1}%";
             if (_taxRatesLabel != null) _taxRatesLabel.Text = $"Income Tax: {sel.IncomeTaxRate * 100:F0}%  •  Corporate: {sel.CorporateTaxRate * 100:F0}%  •  VAT: {sel.VatRate * 100:F0}%";
             if (_statusLabel != null)
             {
                 _statusLabel.Text = sel.IsPlayable ? "STATUS: SOVEREIGN NATION READY TO LEAD" : "STATUS: NON-PLAYABLE NATION";
                 _statusLabel.Modulate = sel.IsPlayable ? new Color(0.06f, 0.72f, 0.50f) : new Color(0.85f, 0.2f, 0.2f);
+            }
+
+            // Sync map view
+            if (_worldMap?.ViewModel != null)
+            {
+                _worldMap.ViewModel.SelectCountry(sel.Id);
+                _worldMap.ViewModel.FocusCountry(sel.Id);
             }
         }
 
