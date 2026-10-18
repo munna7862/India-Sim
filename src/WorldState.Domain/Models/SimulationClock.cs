@@ -39,9 +39,11 @@ public class SimulationClock
         _ => 1.0
     };
 
+    public const int MaxDaysPerTick = 365;
+
     public void Tick(double deltaSeconds)
     {
-        if (Speed == ClockSpeed.Paused || deltaSeconds <= 0)
+        if (Speed == ClockSpeed.Paused || deltaSeconds <= 0 || double.IsNaN(deltaSeconds) || double.IsInfinity(deltaSeconds))
         {
             return;
         }
@@ -49,10 +51,18 @@ public class SimulationClock
         AccumulatorSeconds += deltaSeconds;
         double secondsPerDay = GetSecondsPerDay();
 
-        while (AccumulatorSeconds >= secondsPerDay && secondsPerDay > 0)
+        int daysAdvanced = 0;
+        while (AccumulatorSeconds >= secondsPerDay && secondsPerDay > 0 && daysAdvanced < MaxDaysPerTick)
         {
             AccumulatorSeconds -= secondsPerDay;
             AdvanceDay();
+            daysAdvanced++;
+        }
+
+        // Prevent infinite accumulator accumulation during massive frame stalls
+        if (daysAdvanced >= MaxDaysPerTick)
+        {
+            AccumulatorSeconds = 0.0;
         }
     }
 

@@ -52,6 +52,16 @@ public class AdjustTaxRateCommand : ICommand
                 return CommandResult.Failure("UnknownTaxType", $"Tax type {Type} is not recognized.");
         }
 
+        session.AddEvent(new GameEvent(
+            Id: Guid.NewGuid().ToString("N"),
+            Date: session.Clock.CurrentDate,
+            Title: "Tax Policy Adjusted",
+            Message: $"{Type} for {country.Name} adjusted to {NewRate * 100:F1}%.",
+            Category: EventCategory.Economy,
+            Severity: EventSeverity.Info,
+            ActorCountryId: CountryId
+        ));
+
         return CommandResult.Success();
     }
 }

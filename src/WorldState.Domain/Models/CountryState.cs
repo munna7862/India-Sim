@@ -21,14 +21,36 @@ public class CountryState
     // Resources
     public ResourceStockpile Stockpiles { get; set; } = ResourceStockpile.DefaultStartingStockpile();
 
+    // National Indicators & Macroeconomics
+    public decimal Debt { get; set; } = 0m;
+    public string CreditRating { get; set; } = "AAA";
+    public double CorruptionIndex { get; set; } = 25.0; // 0.0 (Clean) to 100.0 (Severe Corruption)
+    public double InflationRate { get; set; } = 0.05; // 5.0%
+
+    // Foreign Relations
+    public Dictionary<string, DiplomaticStance> DiplomaticRelations { get; set; } = new();
+
     // Facility counts
     public Dictionary<string, int> Facilities { get; set; } = new()
     {
         ["Farms"] = 50,
         ["Mines"] = 25,
         ["PowerPlants"] = 30,
-        ["Factories"] = 40
+        ["Factories"] = 40,
+        ["Hospitals"] = 20,
+        ["Schools"] = 30,
+        ["Barracks"] = 15
     };
+
+    public DiplomaticStance GetRelationsWith(string otherCountryId)
+    {
+        if (!DiplomaticRelations.TryGetValue(otherCountryId, out var stance))
+        {
+            stance = new DiplomaticStance();
+            DiplomaticRelations[otherCountryId] = stance;
+        }
+        return stance;
+    }
 
     public static CountryState CreateIndiaDefault()
     {
