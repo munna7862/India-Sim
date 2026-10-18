@@ -1,5 +1,8 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using WorldState.Domain.Data;
+using WorldState.Domain.Map;
+using WorldState.Domain.Scenarios;
 
 Console.WriteLine("=== Rashtra Content Validator ===");
 
@@ -22,102 +25,145 @@ if (!Directory.Exists(contentDir))
 }
 
 Console.WriteLine($"Scanning content in: {contentDir}");
-string[] countryFiles = Directory.GetFiles(contentDir, "*.json", SearchOption.AllDirectories);
-int validatedCount = 0;
 int errorCount = 0;
-var seenIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+int validatedCountries = 0;
+int validatedScenarios = 0;
+int validatedMaps = 0;
+
 var isoRegex = new Regex("^[A-Z]{3}$", RegexOptions.Compiled);
+var countryRegistry = new CountryRegistry();
 
-foreach (string file in countryFiles)
+// 1. Validate Countries
+string countriesDir = Path.Combine(contentDir, "countries");
+if (Directory.Exists(countriesDir))
 {
-    Console.WriteLine($"Validating: {Path.GetFileName(file)}...");
-    try
+    Console.WriteLine("\n--- Validating Country Definitions ---");
+    string[] countryFiles = Directory.GetFiles(countriesDir, "*.json");
+    foreach (string file in countryFiles)
     {
-        string json = File.ReadAllText(file);
-        using var doc = JsonDocument.Parse(json);
-        var root = doc.RootElement;
+        Console.WriteLine($"Validating country: {Path.GetFileName(file)}...");
+        try
+        {
+            string json = File.ReadAllText(file);
+            var def = JsonSerializer.Deserialize<CountryDefinition>(json);
+            if (def == null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Failed to deserialize CountryDefinition from {Path.GetFileName(file)}.");
+                Console.ResetColor();
+                errorCount++;
+                continue;
+            }
 
-        // 1. ID Check (ISO 3166-1 alpha-3)
-        if (!root.TryGetProperty("id", out var idProp) || string.IsNullOrWhiteSpace(idProp.GetString()))
+            countryRegistry.Register(def);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"  [OK] Valid country definition: {def.Id} - {def.Name} (Capital: {def.Capital})");
+            Console.ResetColor();
+            validatedCountries++;
+        }
+        catch (Exception ex)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [FAIL] Missing required non-empty string property 'id'.");
+            Console.WriteLine($"  [ERROR] Validation failure: {ex.Message}");
             Console.ResetColor();
             errorCount++;
-            continue;
         }
-
-        string id = idProp.GetString()!;
-        if (!isoRegex.IsMatch(id))
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [FAIL] ID '{id}' is not a valid 3-letter uppercase ISO 3166-1 alpha-3 code.");
-            Console.ResetColor();
-            errorCount++;
-            continue;
-        }
-
-        if (seenIds.Contains(id))
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [FAIL] Duplicate country ID '{id}' detected in file: {Path.GetFileName(file)}");
-            Console.ResetColor();
-            errorCount++;
-            continue;
-        }
-        seenIds.Add(id);
-
-        // 2. Name & Capital Check
-        if (!root.TryGetProperty("name", out var nameProp) || string.IsNullOrWhiteSpace(nameProp.GetString()))
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [FAIL] Missing required non-empty string property 'name'.");
-            Console.ResetColor();
-            errorCount++;
-            continue;
-        }
-
-        if (!root.TryGetProperty("capital", out var capitalProp) || string.IsNullOrWhiteSpace(capitalProp.GetString()))
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [FAIL] Missing required non-empty string property 'capital'.");
-            Console.ResetColor();
-            errorCount++;
-            continue;
-        }
-
-        // 3. Stats Invariant Checks
-        if (!root.TryGetProperty("startingTreasury", out var treasuryProp) || treasuryProp.GetDecimal() < 0)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [FAIL] Missing or invalid 'startingTreasury' (must be >= 0).");
-            Console.ResetColor();
-            errorCount++;
-            continue;
-        }
-
-        if (!root.TryGetProperty("startingPopulation", out var popProp) || popProp.GetInt64() <= 0)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  [FAIL] Missing or invalid 'startingPopulation' (must be > 0).");
-            Console.ResetColor();
-            errorCount++;
-            continue;
-        }
-
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"  [OK] Valid country definition: {id} - {nameProp.GetString()} (Capital: {capitalProp.GetString()})");
-        Console.ResetColor();
-        validatedCount++;
-    }
-    catch (Exception ex)
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"  [ERROR] Parsing failure: {ex.Message}");
-        Console.ResetColor();
-        errorCount++;
     }
 }
 
-Console.WriteLine($"\nValidation Complete: {validatedCount} valid countries verified, {errorCount} errors.");
+// 2. Validate Scenarios
+string scenariosDir = Path.Combine(contentDir, "scenarios");
+if (Directory.Exists(scenariosDir))
+{
+    Console.WriteLine("\n--- Validating Scenario Definitions ---");
+    string[] scenarioFiles = Directory.GetFiles(scenariosDir, "*.json");
+    foreach (string file in scenarioFiles)
+    {
+        Console.WriteLine($"Validating scenario: {Path.GetFileName(file)}...");
+        try
+        {
+            string json = File.ReadAllText(file);
+            var scenario = JsonSerializer.Deserialize<ScenarioDefinition>(json);
+            if (scenario == null || string.IsNullOrWhiteSpace(scenario.Id))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Missing or invalid scenario structure in {Path.GetFileName(file)}.");
+                Console.ResetColor();
+                errorCount++;
+                continue;
+            }
+
+            if (!countryRegistry.TryGet(scenario.DefaultCountryId, out _))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] Scenario default country '{scenario.DefaultCountryId}' does not exist in country registry.");
+                Console.ResetColor();
+                errorCount++;
+                continue;
+            }
+
+            foreach (var countryId in scenario.SupportedCountryIds)
+            {
+                if (!countryRegistry.TryGet(countryId, out _))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"  [FAIL] Scenario supported country '{countryId}' does not exist in country registry.");
+                    Console.ResetColor();
+                    errorCount++;
+                }
+            }
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"  [OK] Valid scenario: {scenario.Id} - {scenario.Name} (Default: {scenario.DefaultCountryId}, {scenario.SupportedCountryIds.Count} countries)");
+            Console.ResetColor();
+            validatedScenarios++;
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [ERROR] Scenario validation failure: {ex.Message}");
+            Console.ResetColor();
+            errorCount++;
+        }
+    }
+}
+
+// 3. Validate Map Geometries
+string mapDir = Path.Combine(contentDir, "map");
+if (Directory.Exists(mapDir))
+{
+    Console.WriteLine("\n--- Validating Map Datasets ---");
+    string[] mapFiles = Directory.GetFiles(mapDir, "*.geojson");
+    foreach (string file in mapFiles)
+    {
+        Console.WriteLine($"Validating map dataset: {Path.GetFileName(file)}...");
+        try
+        {
+            string geoJson = File.ReadAllText(file);
+            var mapData = GeoJsonMapLoader.LoadFromJson(geoJson);
+            if (mapData.Countries.Count == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  [FAIL] No country geometries extracted from {Path.GetFileName(file)}.");
+                Console.ResetColor();
+                errorCount++;
+                continue;
+            }
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"  [OK] Valid map dataset: {Path.GetFileName(file)} with {mapData.Countries.Count} country geometries.");
+            Console.ResetColor();
+            validatedMaps++;
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [ERROR] Map validation failure: {ex.Message}");
+            Console.ResetColor();
+            errorCount++;
+        }
+    }
+}
+
+Console.WriteLine($"\nValidation Complete: {validatedCountries} countries, {validatedScenarios} scenarios, {validatedMaps} map datasets. Errors: {errorCount}.");
 return errorCount == 0 ? 0 : 1;

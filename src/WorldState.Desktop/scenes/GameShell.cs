@@ -7,7 +7,8 @@ namespace WorldState.Desktop.Scenes;
 
 public partial class GameShell : Control
 {
-    private GameSession _session = GameSession.CreateNewGame("IND");
+    public static GameSession? ActiveSession { get; set; }
+    private GameSession _session = ActiveSession ?? GameSession.CreateNewGame("IND");
     private readonly NavigationService _nav = new();
 
     private Label? _dateLabel;
@@ -23,6 +24,11 @@ public partial class GameShell : Control
 
     public override void _Ready()
     {
+        if (ActiveSession != null)
+        {
+            _session = ActiveSession;
+        }
+
         _dateLabel = GetNodeOrNull<Label>("TopBar/HBox/DateLabel");
         _treasuryLabel = GetNodeOrNull<Label>("TopBar/HBox/TreasuryLabel");
         _popLabel = GetNodeOrNull<Label>("TopBar/HBox/PopLabel");
@@ -121,5 +127,17 @@ public partial class GameShell : Control
         if (_approvalLabel != null) _approvalLabel.Text = $"APPROVAL: {vm.ApprovalText}";
         if (_livingLabel != null) _livingLabel.Text = $"LIVING: {vm.LivingStandardText}";
         if (_speedLabel != null) _speedLabel.Text = $"[{vm.SpeedText}]";
+
+        var playerCountry = _session.GetPlayerCountry();
+        var mapTitle = GetNodeOrNull<Label>("CentralMapPlaceholder/VBox/MapTitle");
+        var mapInfo = GetNodeOrNull<Label>("CentralMapPlaceholder/VBox/MapInfo");
+        if (mapTitle != null && playerCountry != null)
+        {
+            mapTitle.Text = $"WORLD MAP • {playerCountry.Name.ToUpperInvariant()} [{playerCountry.Id}]";
+        }
+        if (mapInfo != null && playerCountry != null)
+        {
+            mapInfo.Text = $"Sovereign Administration Active • Scenario: {_session.ScenarioId} • Stability: {playerCountry.Stability:F0}%";
+        }
     }
 }

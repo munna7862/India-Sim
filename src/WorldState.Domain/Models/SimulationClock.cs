@@ -14,6 +14,19 @@ public class SimulationClock
     public ClockSpeed Speed { get; set; } = ClockSpeed.Normal;
     public double AccumulatorSeconds { get; set; } = 0.0;
 
+    public SimulationClock() { }
+
+    public SimulationClock(DateOnly startDate, ClockSpeed speed = ClockSpeed.Normal)
+    {
+        CurrentDate = startDate;
+        Speed = speed;
+    }
+
+    public SimulationClock(DateTime startDate, ClockSpeed speed = ClockSpeed.Normal)
+        : this(DateOnly.FromDateTime(startDate), speed)
+    {
+    }
+
     public event Action<DateOnly>? OnDayPassed;
     public event Action<DateOnly>? OnMonthPassed;
 

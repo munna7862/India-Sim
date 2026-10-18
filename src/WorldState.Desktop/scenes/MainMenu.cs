@@ -34,7 +34,7 @@ public partial class MainMenu : Control
 
     private void OnNewGamePressed()
     {
-        GetTree().ChangeSceneToFile("res://scenes/GameShell.tscn");
+        GetTree().ChangeSceneToFile("res://scenes/CountrySelect.tscn");
     }
 
     private void OnSettingsPressed()
