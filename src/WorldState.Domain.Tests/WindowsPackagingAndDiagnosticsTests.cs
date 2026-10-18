@@ -126,8 +126,11 @@ public class WindowsPackagingAndDiagnosticsTests
             Assert.True(writable);
             Assert.True(Directory.Exists(nestedNewDir));
 
-            // 2. Invalid path characters return false without throwing
-            bool invalidWritable = service.TestDirectoryWritable("Z:\\Invalid::??//Path");
+            // 2. Path blocked by existing file returns false cross-platform without throwing
+            string blockingFile = Path.Combine(tempDir, "blocking_file.txt");
+            File.WriteAllText(blockingFile, "block");
+            string invalidChildPath = Path.Combine(blockingFile, "sub_dir");
+            bool invalidWritable = service.TestDirectoryWritable(invalidChildPath);
             Assert.False(invalidWritable);
         }
         finally
