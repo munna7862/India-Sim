@@ -181,13 +181,13 @@ text = "ECO"
 [node name="BtnDiplomacy" type="Button" parent="LeftNavRail/VBox"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-tooltip_text = "F5: Diplomacy & Treaties"
+tooltip_text = "F6: Diplomacy & Treaties"
 text = "DIP"
 
 [node name="BtnMilitary" type="Button" parent="LeftNavRail/VBox"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-tooltip_text = "F6: Armed Forces"
+tooltip_text = "F7: Armed Forces & Defense"
 text = "MIL"
 
 [node name="FooterBar" type="ColorRect" parent="."]
@@ -503,5 +503,136 @@ text = "ECONOMIC DEVELOPMENT POLICIES & PROGRAMS"
 [node name="PoliciesContainer" type="VBoxContainer" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
 layout_mode = 2
 theme_override_constants/separation = 8
+
+[node name="DiplomacyPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 72.0
+offset_top = 64.0
+offset_right = -16.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="DiplomacyPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="DiplomacyPanel/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="DiplomacyPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "FOREIGN AFFAIRS, BILATERAL DIPLOMACY & TREATIES"
+
+[node name="CloseButton" type="Button" parent="DiplomacyPanel/VBox/Header"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "✕"
+
+[node name="DiplomacySummaryLabel" type="Label" parent="DiplomacyPanel/VBox"]
+layout_mode = 2
+text = "Foreign Nations: 5 | Active Pacts: 0 | Trade Contracts: 0 | At War: 0"
+
+[node name="Scroll" type="ScrollContainer" parent="DiplomacyPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NationsList" type="VBoxContainer" parent="DiplomacyPanel/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="MilitaryPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 72.0
+offset_top = 64.0
+offset_right = -16.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="MilitaryPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="MilitaryPanel/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MilitaryPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "ARMED FORCES, DEFENSE READINESS & MILITARY INVENTORY"
+
+[node name="CloseButton" type="Button" parent="MilitaryPanel/VBox/Header"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "✕"
+
+[node name="MilitarySummaryHBox" type="HBoxContainer" parent="MilitaryPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ForceStrengthLabel" type="Label" parent="MilitaryPanel/VBox/MilitarySummaryHBox"]
+layout_mode = 2
+text = "Force Strength: 0 Combat / 0 Defense"
+
+[node name="DrillsStatusLabel" type="Label" parent="MilitaryPanel/VBox/MilitarySummaryHBox"]
+layout_mode = 2
+text = "Drills: Inactive"
+
+[node name="DrillsBtn" type="Button" parent="MilitaryPanel/VBox/MilitarySummaryHBox"]
+layout_mode = 2
+text = "Conduct Army Drills ($100M)"
+
+[node name="SecurityActionsHBox" type="HBoxContainer" parent="MilitaryPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CounterTerrorBtn" type="Button" parent="MilitaryPanel/VBox/SecurityActionsHBox"]
+layout_mode = 2
+text = "Counter-Terrorism Strike ($200M)"
+
+[node name="ProtectionLevelBtn" type="Button" parent="MilitaryPanel/VBox/SecurityActionsHBox"]
+layout_mode = 2
+text = "Security: Medium"
+
+[node name="Scroll" type="ScrollContainer" parent="MilitaryPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="UnitsList" type="VBoxContainer" parent="MilitaryPanel/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
 
 

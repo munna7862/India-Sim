@@ -10,6 +10,7 @@ public record MonthlyBudgetReport
     public decimal CorporateTaxRevenue { get; init; }
     public decimal VatRevenue { get; init; }
     public decimal CommercialFacilityRevenue { get; init; }
+    public decimal TradeExportRevenue { get; init; }
     public decimal GrossRevenue { get; init; }
     public double TaxEfficiency { get; init; } = 1.0;
 
@@ -18,9 +19,11 @@ public record MonthlyBudgetReport
     public decimal MinisterSalaries { get; init; }
     public decimal CivilAdministrationExpenses { get; init; }
     public decimal DefenseUpkeepExpenses { get; init; }
+    public decimal MilitaryUnitUpkeepExpenses { get; init; }
     public decimal FacilityUpkeepExpenses { get; init; }
     public decimal DebtInterestExpenses { get; init; }
     public decimal ActivePolicyUpkeepExpenses { get; init; }
+    public decimal TradeImportExpenses { get; init; }
     public decimal GrossExpenses { get; init; }
 
     // Net Delta & Macro

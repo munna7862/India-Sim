@@ -16,7 +16,9 @@ public class SimulationEngine
     {
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _session.PolicyRegistry ??= Economy.EconomicPolicyRegistry.CreateDefaultCatalog();
+        _session.MilitaryRegistry ??= Military.MilitaryUnitRegistry.CreateDefaultCatalog();
         WireClockEvents();
+
     }
 
     private void WireClockEvents()

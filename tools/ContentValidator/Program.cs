@@ -255,5 +255,36 @@ if (Directory.Exists(policiesDir))
     }
 }
 
-Console.WriteLine($"\nValidation Complete: {validatedCountries} countries, {validatedScenarios} scenarios, {validatedMaps} map datasets, {validatedTasks} tasks, {validatedEvents} events, {validatedPolicies} policies. Errors: {errorCount}.");
+// 7. Validate Military Unit Definitions
+string militaryDir = Path.Combine(contentDir, "military");
+int validatedUnits = 0;
+if (Directory.Exists(militaryDir))
+{
+    Console.WriteLine("\n--- Validating Military Unit Definitions ---");
+    string[] unitFiles = Directory.GetFiles(militaryDir, "*.json");
+    foreach (string file in unitFiles)
+    {
+        Console.WriteLine($"Validating military units: {Path.GetFileName(file)}...");
+        try
+        {
+            string json = File.ReadAllText(file);
+            var militaryRegistry = new WorldState.Domain.Military.MilitaryUnitRegistry();
+            militaryRegistry.LoadFromJson(json);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"  [OK] Valid military units dataset: {Path.GetFileName(file)} with {militaryRegistry.Units.Count} unit definitions.");
+            Console.ResetColor();
+            validatedUnits += militaryRegistry.Units.Count;
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [ERROR] Military unit validation failure: {ex.Message}");
+            Console.ResetColor();
+            errorCount++;
+        }
+    }
+}
+
+Console.WriteLine($"\nValidation Complete: {validatedCountries} countries, {validatedScenarios} scenarios, {validatedMaps} map datasets, {validatedTasks} tasks, {validatedEvents} events, {validatedPolicies} policies, {validatedUnits} military units. Errors: {errorCount}.");
 return errorCount == 0 ? 0 : 1;
+

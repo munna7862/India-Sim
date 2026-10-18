@@ -60,7 +60,22 @@ public partial class GameShell : Control
     private VBoxContainer? _facilitiesContainer;
     private VBoxContainer? _policiesContainer;
 
+    // Phase 06 Diplomacy & Military Controls
+    private Button? _btnDiplomacy;
+    private Button? _btnMilitary;
+    private Panel? _diplomacyPanel;
+    private Panel? _militaryPanel;
+    private Label? _diplomacySummaryLabel;
+    private VBoxContainer? _nationsList;
+    private Label? _forceStrengthLabel;
+    private Label? _drillsStatusLabel;
+    private Button? _drillsBtn;
+    private Button? _counterTerrorBtn;
+    private Button? _protectionLevelBtn;
+    private VBoxContainer? _unitsList;
+
     public override void _Ready()
+
     {
         if (ActiveSession != null)
         {
@@ -95,17 +110,23 @@ public partial class GameShell : Control
         _btnCabinet = GetNodeOrNull<Button>("LeftNavRail/VBox/BtnCabinet");
         _btnTasks = GetNodeOrNull<Button>("LeftNavRail/VBox/BtnTasks");
         _btnEconomy = GetNodeOrNull<Button>("LeftNavRail/VBox/BtnEconomy");
+        _btnDiplomacy = GetNodeOrNull<Button>("LeftNavRail/VBox/BtnDiplomacy");
+        _btnMilitary = GetNodeOrNull<Button>("LeftNavRail/VBox/BtnMilitary");
 
         if (_btnOverview != null) _btnOverview.Pressed += () => ShowPanel(null);
         if (_btnCabinet != null) _btnCabinet.Pressed += () => ShowPanel(_cabinetPanel);
         if (_btnTasks != null) _btnTasks.Pressed += () => ShowPanel(_tasksPanel);
         if (_btnEconomy != null) _btnEconomy.Pressed += () => ShowPanel(_economyPanel);
+        if (_btnDiplomacy != null) _btnDiplomacy.Pressed += () => ShowPanel(_diplomacyPanel);
+        if (_btnMilitary != null) _btnMilitary.Pressed += () => ShowPanel(_militaryPanel);
 
         // Panels
         _cabinetPanel = GetNodeOrNull<Panel>("CabinetPanel");
         _tasksPanel = GetNodeOrNull<Panel>("TasksPanel");
         _emergencyDialog = GetNodeOrNull<Panel>("EmergencyDialog");
         _economyPanel = GetNodeOrNull<Panel>("EconomyPanel");
+        _diplomacyPanel = GetNodeOrNull<Panel>("DiplomacyPanel");
+        _militaryPanel = GetNodeOrNull<Panel>("MilitaryPanel");
 
         var closeCabinet = GetNodeOrNull<Button>("CabinetPanel/VBox/Header/CloseButton");
         if (closeCabinet != null) closeCabinet.Pressed += () => ShowPanel(null);
@@ -115,6 +136,71 @@ public partial class GameShell : Control
 
         var closeEconomy = GetNodeOrNull<Button>("EconomyPanel/VBox/Header/CloseButton");
         if (closeEconomy != null) closeEconomy.Pressed += () => ShowPanel(null);
+
+        var closeDiplomacy = GetNodeOrNull<Button>("DiplomacyPanel/VBox/Header/CloseButton");
+        if (closeDiplomacy != null) closeDiplomacy.Pressed += () => ShowPanel(null);
+
+        var closeMilitary = GetNodeOrNull<Button>("MilitaryPanel/VBox/Header/CloseButton");
+        if (closeMilitary != null) closeMilitary.Pressed += () => ShowPanel(null);
+
+        _diplomacySummaryLabel = GetNodeOrNull<Label>("DiplomacyPanel/VBox/DiplomacySummaryLabel");
+        _nationsList = GetNodeOrNull<VBoxContainer>("DiplomacyPanel/VBox/Scroll/NationsList");
+
+        _forceStrengthLabel = GetNodeOrNull<Label>("MilitaryPanel/VBox/MilitarySummaryHBox/ForceStrengthLabel");
+        _drillsStatusLabel = GetNodeOrNull<Label>("MilitaryPanel/VBox/MilitarySummaryHBox/DrillsStatusLabel");
+        _drillsBtn = GetNodeOrNull<Button>("MilitaryPanel/VBox/MilitarySummaryHBox/DrillsBtn");
+        if (_drillsBtn != null)
+        {
+            _drillsBtn.Pressed += () =>
+            {
+                var country = _session.GetPlayerCountry();
+                if (country != null)
+                {
+                    _engine.Dispatch(new ConductArmyDrillsCommand(country.Id));
+                    RefreshMilitaryView();
+                    RefreshHud();
+                }
+            };
+        }
+
+        _counterTerrorBtn = GetNodeOrNull<Button>("MilitaryPanel/VBox/SecurityActionsHBox/CounterTerrorBtn");
+        if (_counterTerrorBtn != null)
+        {
+            _counterTerrorBtn.Pressed += () =>
+            {
+                var country = _session.GetPlayerCountry();
+                if (country != null)
+                {
+                    _engine.Dispatch(new LaunchCounterTerrorismCommand(country.Id));
+                    RefreshMilitaryView();
+                    RefreshHud();
+                }
+            };
+        }
+
+        _protectionLevelBtn = GetNodeOrNull<Button>("MilitaryPanel/VBox/SecurityActionsHBox/ProtectionLevelBtn");
+        if (_protectionLevelBtn != null)
+        {
+            _protectionLevelBtn.Pressed += () =>
+            {
+                var country = _session.GetPlayerCountry();
+                if (country != null)
+                {
+                    var next = country.PresidentialProtectionLevel switch
+                    {
+                        FundingLevel.Low => FundingLevel.Medium,
+                        FundingLevel.Medium => FundingLevel.High,
+                        FundingLevel.High => FundingLevel.Maximum,
+                        FundingLevel.Maximum => FundingLevel.Low,
+                        _ => FundingLevel.Medium
+                    };
+                    _engine.Dispatch(new FundPresidentialProtectionCommand(country.Id, next));
+                    RefreshMilitaryView();
+                }
+            };
+        }
+
+        _unitsList = GetNodeOrNull<VBoxContainer>("MilitaryPanel/VBox/Scroll/UnitsList");
 
         _ideologyLabel = GetNodeOrNull<Label>("CabinetPanel/VBox/IdeologyHBox/IdeologyLabel");
         _changeIdeologyBtn = GetNodeOrNull<Button>("CabinetPanel/VBox/IdeologyHBox/ChangeIdeologyBtn");
@@ -187,6 +273,8 @@ public partial class GameShell : Control
         if (_cabinetPanel != null) _cabinetPanel.Visible = (_cabinetPanel == targetPanel);
         if (_tasksPanel != null) _tasksPanel.Visible = (_tasksPanel == targetPanel);
         if (_economyPanel != null) _economyPanel.Visible = (_economyPanel == targetPanel);
+        if (_diplomacyPanel != null) _diplomacyPanel.Visible = (_diplomacyPanel == targetPanel);
+        if (_militaryPanel != null) _militaryPanel.Visible = (_militaryPanel == targetPanel);
 
         if (targetPanel == _cabinetPanel)
         {
@@ -203,11 +291,22 @@ public partial class GameShell : Control
             _nav.NavigateTo(ScreenRoute.EconomyAndBudget);
             RefreshEconomyView();
         }
+        else if (targetPanel == _diplomacyPanel)
+        {
+            _nav.NavigateTo(ScreenRoute.DiplomacyAndTreaties);
+            RefreshDiplomacyView();
+        }
+        else if (targetPanel == _militaryPanel)
+        {
+            _nav.NavigateTo(ScreenRoute.MilitaryAndDefense);
+            RefreshMilitaryView();
+        }
         else
         {
             _nav.NavigateTo(ScreenRoute.WorldMap);
         }
     }
+
 
     private void RefreshCabinetView()
     {
@@ -616,6 +715,254 @@ public partial class GameShell : Control
         }
     }
 
+    private void RefreshDiplomacyView()
+    {
+        var vm = DiplomacyViewModel.FromSession(_session);
+        if (_diplomacySummaryLabel != null)
+        {
+            _diplomacySummaryLabel.Text = $"Foreign Nations: {vm.TotalForeignNations} | Active Non-Aggression Pacts: {vm.ActiveNapCount} | Trade Deals: {vm.TotalActiveTradeContracts} | At War: {vm.AtWarCount}";
+        }
+
+        if (_nationsList == null) return;
+        foreach (Node child in _nationsList.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        var playerCountry = _session.GetPlayerCountry();
+        if (playerCountry == null) return;
+
+        foreach (var nation in vm.ForeignNations)
+        {
+            var card = new PanelContainer();
+            var vbox = new VBoxContainer();
+
+            var topRow = new HBoxContainer();
+            topRow.AddThemeConstantOverride("separation", 12);
+
+            var nameLabel = new Label
+            {
+                Text = $"{nation.CountryName} [{nation.CountryId}]",
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            topRow.AddChild(nameLabel);
+
+            var statusBadge = new Label
+            {
+                Text = $"Stance: {nation.StatusText} ({nation.RelationsText})"
+            };
+            topRow.AddChild(statusBadge);
+
+            var napBadge = new Label
+            {
+                Text = nation.NapExpiryText
+            };
+            topRow.AddChild(napBadge);
+
+            vbox.AddChild(topRow);
+
+            var actionRow = new HBoxContainer();
+            actionRow.AddThemeConstantOverride("separation", 8);
+
+
+            var aidBtn = new Button
+            {
+                Text = "+ Aid $250M (+5 Rel)",
+                Disabled = !nation.CanSendAid
+            };
+            var targetId = nation.CountryId;
+            aidBtn.Pressed += () =>
+            {
+                _engine.Dispatch(new SendDiplomaticGiftCommand(playerCountry.Id, targetId, DiplomaticGiftTier.Small));
+                RefreshDiplomacyView();
+                RefreshHud();
+            };
+            actionRow.AddChild(aidBtn);
+
+            var napBtn = new Button
+            {
+                Text = "Sign NAP 24mo ($50M)",
+                Disabled = !nation.CanSignNap
+            };
+            napBtn.Pressed += () =>
+            {
+                _engine.Dispatch(new SignNonAggressionPactCommand(playerCountry.Id, targetId, 24));
+                RefreshDiplomacyView();
+                RefreshHud();
+            };
+            actionRow.AddChild(napBtn);
+
+            var tradeBtn = new Button
+            {
+                Text = "+ Export 5k Food ($200M/mo)",
+                Disabled = nation.IsAtWar || nation.ActiveTradeContractCount >= 2
+            };
+            tradeBtn.Pressed += () =>
+            {
+                _engine.Dispatch(new SignTradeContractCommand(
+                    exporterCountryId: playerCountry.Id,
+                    importerCountryId: targetId,
+                    resourceType: "Food",
+                    monthlyQuantity: 5_000.0,
+                    monthlyPayment: 200_000_000m,
+                    durationMonths: 24
+                ));
+                RefreshDiplomacyView();
+                RefreshHud();
+            };
+            actionRow.AddChild(tradeBtn);
+
+            if (nation.IsAtWar)
+            {
+                var peaceBtn = new Button
+                {
+                    Text = "Sign Peace Treaty"
+                };
+                peaceBtn.Pressed += () =>
+                {
+                    _engine.Dispatch(new SignPeaceTreatyCommand(playerCountry.Id, targetId));
+                    RefreshDiplomacyView();
+                    RefreshHud();
+                };
+                actionRow.AddChild(peaceBtn);
+
+                var attackBtn = new Button
+                {
+                    Text = "Launch Offensive Strike"
+                };
+                attackBtn.Pressed += () =>
+                {
+                    _engine.Dispatch(new ResolveCombatCommand(playerCountry.Id, targetId));
+                    RefreshDiplomacyView();
+                    RefreshHud();
+                };
+                actionRow.AddChild(attackBtn);
+            }
+            else
+            {
+                var warBtn = new Button
+                {
+                    Text = "Declare War",
+                    Disabled = !nation.CanDeclareWar
+                };
+                warBtn.Pressed += () =>
+                {
+                    _engine.Dispatch(new DeclareWarCommand(playerCountry.Id, targetId));
+                    RefreshDiplomacyView();
+                    RefreshHud();
+                };
+                actionRow.AddChild(warBtn);
+            }
+
+            var spyBtn = new Button
+            {
+                Text = "Spy Intel ($150M)"
+            };
+            spyBtn.Pressed += () =>
+            {
+                _engine.Dispatch(new DispatchCovertOperationCommand(playerCountry.Id, targetId, CovertOperationType.GatherIntelligence));
+                RefreshDiplomacyView();
+                RefreshHud();
+            };
+            actionRow.AddChild(spyBtn);
+
+            vbox.AddChild(actionRow);
+            card.AddChild(vbox);
+            _nationsList.AddChild(card);
+        }
+    }
+
+    private void RefreshMilitaryView()
+    {
+        var vm = MilitaryViewModel.FromSession(_session);
+        if (_forceStrengthLabel != null)
+        {
+            _forceStrengthLabel.Text = $"Force: {vm.TotalCombatPower:N0} ATK / {vm.TotalDefensePower:N0} DEF | Units: {vm.TotalUnits:N0} (Land: {vm.LandUnitsCount}, Air: {vm.AirUnitsCount}, Sea: {vm.NavalUnitsCount}) | Upkeep: ${vm.TotalMonthlyUpkeep / 1_000_000m:F0}M/mo";
+        }
+
+        if (_drillsStatusLabel != null)
+        {
+            _drillsStatusLabel.Text = vm.DrillReadinessExpiryText;
+        }
+
+        var playerCountry = _session.GetPlayerCountry();
+        if (playerCountry != null && _protectionLevelBtn != null)
+        {
+            _protectionLevelBtn.Text = $"Presidential Protection: {playerCountry.PresidentialProtectionLevel}";
+        }
+
+        if (_unitsList == null) return;
+        foreach (Node child in _unitsList.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        if (playerCountry == null) return;
+
+        foreach (var unit in vm.Units)
+        {
+            var row = new HBoxContainer();
+            row.AddThemeConstantOverride("separation", 12);
+
+
+            var nameLabel = new Label
+            {
+                Text = $"{unit.UnitName} [{unit.Branch}] - In Inventory: {unit.ActiveCount}x (Power: {unit.CombatPower} Atk / {unit.DefensePower} Def, Upkeep: ${unit.MonthlyUpkeepTreasury / 1_000_000m:F1}M/mo)",
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            row.AddChild(nameLabel);
+
+            var costLabel = new Label
+            {
+                Text = $"Cost: ${unit.CostTreasury / 1_000_000m:F0}M + {unit.CostIron:F0} Fe + {unit.CostOil:F0} Oil"
+            };
+            row.AddChild(costLabel);
+
+            var uId = unit.UnitId;
+
+            var btn1 = new Button
+            {
+                Text = "+1",
+                Disabled = !unit.CanAfford1
+            };
+            btn1.Pressed += () =>
+            {
+                _engine.Dispatch(new RecruitMilitaryUnitsCommand(playerCountry.Id, uId, 1));
+                RefreshMilitaryView();
+                RefreshHud();
+            };
+            row.AddChild(btn1);
+
+            var btn5 = new Button
+            {
+                Text = "+5",
+                Disabled = !unit.CanAfford5
+            };
+            btn5.Pressed += () =>
+            {
+                _engine.Dispatch(new RecruitMilitaryUnitsCommand(playerCountry.Id, uId, 5));
+                RefreshMilitaryView();
+                RefreshHud();
+            };
+            row.AddChild(btn5);
+
+            var btn10 = new Button
+            {
+                Text = "+10",
+                Disabled = !unit.CanAfford10
+            };
+            btn10.Pressed += () =>
+            {
+                _engine.Dispatch(new RecruitMilitaryUnitsCommand(playerCountry.Id, uId, 10));
+                RefreshMilitaryView();
+                RefreshHud();
+            };
+            row.AddChild(btn10);
+
+            _unitsList.AddChild(row);
+        }
+    }
+
     public override void _UnhandledInput(InputEvent @event)
     {
         if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
@@ -652,6 +999,14 @@ public partial class GameShell : Control
                     break;
                 case Key.F4:
                     ShowPanel(_economyPanel);
+                    GetViewport().SetInputAsHandled();
+                    break;
+                case Key.F6:
+                    ShowPanel(_diplomacyPanel);
+                    GetViewport().SetInputAsHandled();
+                    break;
+                case Key.F7:
+                    ShowPanel(_militaryPanel);
                     GetViewport().SetInputAsHandled();
                     break;
                 case Key.F5:
@@ -716,6 +1071,18 @@ public partial class GameShell : Control
             return;
         }
 
+        if (_diplomacyPanel != null && _diplomacyPanel.Visible)
+        {
+            ShowPanel(null);
+            return;
+        }
+
+        if (_militaryPanel != null && _militaryPanel.Visible)
+        {
+            ShowPanel(null);
+            return;
+        }
+
         if (_nav.CanNavigateBack)
         {
             _nav.NavigateBack();
@@ -725,6 +1092,7 @@ public partial class GameShell : Control
             GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");
         }
     }
+
 
     private void RefreshHud()
     {

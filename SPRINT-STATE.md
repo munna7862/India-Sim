@@ -1,15 +1,15 @@
 # Sprint State
 
 - Project: Rashtra: Sovereign Republic (Desktop Remake)
-- Status: Phase 05 completed; Ready for Phase 06.
-- Active phase: 05 (Economy, Budget & Development) -> COMPLETED
-- Active sprint: 05-03 (Economic loop parity and regression) -> COMPLETED; Next: 06-01 (Diplomacy and commercial agreements)
-- Sprint status: Completed (All 3 Phase 05 sprints completed: National budget and revenue, Economic policies and development actions, Economic loop parity and regression; 145/145 tests green)
-- Last verified commit: Phase 05 completion
-- Last CI run: Local `.\build.ps1` execution passed (145/145 tests pass, ContentValidator verified 6 countries, 1 scenario, 1 map dataset, 8 tasks, 5 domestic events, 6 economic policies, 0 warnings/errors)
+- Status: Phase 06 completed; Ready for Phase 07.
+- Active phase: 06 (Diplomacy, Military & International Actions) -> COMPLETED
+- Active sprint: 06-03 (Conflict, espionage and security actions) -> COMPLETED; Next: 07-01 (Achievements and progression)
+- Sprint status: Completed (All 3 Phase 06 sprints completed: Diplomacy and commercial agreements, Military inventory, recruitment and deployment, Conflict, espionage and security actions; 165/165 tests green)
+- Last verified commit: Phase 06 completion
+- Last CI run: Local `.\build.ps1` execution passed (165/165 tests pass, ContentValidator verified 6 countries, 1 scenario, 1 map dataset, 8 tasks, 5 domestic events, 6 economic policies, 12 military units, 0 warnings/errors)
 
 ## Current objective
-Transition to Phase 06 (Diplomacy, Military & International Actions) and execute Sprint 06-01 (Diplomacy and commercial agreements).
+Transition to Phase 07 (Achievements, Events, Notifications & Progression) and execute Sprint 07-01 (Achievements and progression).
 
 ## Blockers / decisions
 - Reference Game Access Limitation: Direct Android APK execution is not supported natively in this Windows agent environment without an emulator. Publicly verified developer documentation, store descriptions, and gameplay captures were synthesized into `REFERENCE-INVENTORY.md` and `FEATURE-PARITY-MATRIX.md`. A companion checklist (`docs/research/REFERENCE-RESEARCH-CHECKLIST.md`) is provided for the human owner to log live-session numerical coefficients.
@@ -27,6 +27,9 @@ Transition to Phase 06 (Diplomacy, Military & International Actions) and execute
 - National Budget & Revenue (Sprint 05-01): Completed (`MonthlyBudgetReport`, `ExecuteMonthlyLedgerCommand`, `AdjustTaxRateCommand`, `TakeLoanCommand`, `RepayLoanCommand`, variable interest rates by credit rating AAA-D, sovereign debt distress alerts).
 - Economic Policies & Development Actions (Sprint 05-02): Completed (`content/policies/economic_policies.json`, `EconomicPolicyRegistry`, `EnactEconomicPolicyCommand`, `RevokeEconomicPolicyCommand`, OilWells, UraniumMines, facility and population resource consumption balance).
 - Economic Loop Parity & Desktop Shell (Sprint 05-03): Completed (`EconomyViewModel`, `GameShell.cs` / `GameShell.tscn` `EconomyPanel`, F4 shortcut, multi-month deterministic progression, `EconomyBudgetTests.cs` with 145/145 passing tests).
+- Diplomacy & Commercial Agreements (Sprint 06-01): Completed (`Diplomacy.cs`, `SendDiplomaticGiftCommand.cs`, `SignNonAggressionPactCommand.cs`, `SignTradeContractCommand.cs`, `CancelTradeContractCommand.cs`, monthly trade flow, `DiplomacyViewModel.cs`).
+- Military Inventory & Recruitment (Sprint 06-02): Completed (`content/military/military_units.json` 12 units, `MilitaryUnitRegistry.cs`, `RecruitMilitaryUnitsCommand.cs`, `DisbandMilitaryUnitsCommand.cs`, monthly military upkeep, `MilitaryViewModel.cs`).
+- Conflict & Security Actions (Sprint 06-03): Completed (`DeclareWarCommand.cs`, `ResolveCombatCommand.cs` with drill bonus & homeland defense, `SignPeaceTreatyCommand.cs`, `FundPresidentialProtectionCommand.cs`, `LaunchCounterTerrorismCommand.cs`, `DispatchCovertOperationCommand.cs`, `DiplomacyMilitaryTests.cs` with 165/165 passing tests).
 - Map Data Licensing (ADR-002): Natural Earth Admin 0 Public Domain vector datasets integrated under `GEO-01`.
 - Branding & Clean-Room Policy: Resolved in Sprint 00-02 via `docs/legal/CLEAN-ROOM-POLICY.md` (Working title: "Rashtra: Sovereign Republic").
 
@@ -51,10 +54,10 @@ Transition to Phase 06 (Diplomacy, Military & International Actions) and execute
 | 05-01 | Completed | `MonthlyBudgetReport.cs`, `ExecuteMonthlyLedgerCommand.cs`, `AdjustTaxRateCommand.cs`, `TakeLoanCommand.cs`, `RepayLoanCommand.cs`, `EconomyBudgetTests.cs` (136/136 tests pass) |
 | 05-02 | Completed | `content/policies/economic_policies.json`, `EconomicPolicy.cs`, `EnactEconomicPolicyCommand.cs`, `RevokeEconomicPolicyCommand.cs`, `ContentValidator` (140/140 tests pass) |
 | 05-03 | Completed | `EconomyViewModel.cs`, `GameShell.cs`, `GameShell.tscn`, `EconomyBudgetTests.cs` (145/145 tests pass, `build.ps1` green) |
-| 06-01 | Ready / Next | `plans/sprints/06-01.md` |
-| 06-02 | Not started | None |
-| 06-03 | Not started | None |
-| 07-01 | Not started | None |
+| 06-01 | Completed | `Diplomacy.cs`, `SendDiplomaticGiftCommand.cs`, `SignNonAggressionPactCommand.cs`, `SignTradeContractCommand.cs`, `CancelTradeContractCommand.cs`, `DiplomacyViewModel.cs` |
+| 06-02 | Completed | `content/military/military_units.json`, `MilitaryUnitRegistry.cs`, `RecruitMilitaryUnitsCommand.cs`, `DisbandMilitaryUnitsCommand.cs`, `MilitaryViewModel.cs` |
+| 06-03 | Completed | `DeclareWarCommand.cs`, `ResolveCombatCommand.cs`, `SignPeaceTreatyCommand.cs`, `FundPresidentialProtectionCommand.cs`, `LaunchCounterTerrorismCommand.cs`, `DispatchCovertOperationCommand.cs`, `DiplomacyMilitaryTests.cs` (165/165 tests pass) |
+| 07-01 | Ready / Next | `plans/sprints/07-01.md` |
 | 07-02 | Not started | None |
 | 07-03 | Not started | None |
 | 08-01 | Not started | None |

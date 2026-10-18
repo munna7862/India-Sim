@@ -1,5 +1,12 @@
 namespace WorldState.Domain.Models;
 
+public enum DiplomaticGiftTier
+{
+    Small,
+    Medium,
+    Large
+}
+
 public record TradeContract(
     string Id,
     string ExporterCountryId,
@@ -21,4 +28,20 @@ public class DiplomaticStance
 
     public bool HasActiveNonAggressionPact(DateOnly currentDate) =>
         NonAggressionPactUntil.HasValue && NonAggressionPactUntil.Value >= currentDate;
+
+    public void ModifyRelations(double delta)
+    {
+        Relations = Math.Clamp(Relations + delta, -100.0, 100.0);
+    }
+
+    public string GetStatusText()
+    {
+        if (IsAtWar) return "At War";
+        if (HasAlliance) return "Allied";
+        if (Relations >= 60.0) return "Strategic Partner";
+        if (Relations >= 20.0) return "Friendly";
+        if (Relations >= 0.0) return "Neutral";
+        if (Relations >= -50.0) return "Cold";
+        return "Hostile";
+    }
 }

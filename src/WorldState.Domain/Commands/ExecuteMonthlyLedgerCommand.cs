@@ -56,7 +56,47 @@ public class ExecuteMonthlyLedgerCommand : ICommand
         decimal rawRevenue = incomeTaxRevenue + corporateTaxRevenue + vatRevenue + commercialRevenue;
         var ideologyDef = IdeologyDefinition.Get(country.Ideology);
         double totalTaxEfficiency = Math.Max(0.10, ideologyDef.TaxEfficiencyMultiplier + taxBonus - (country.CorruptionIndex / 250.0));
-        decimal grossRevenue = rawRevenue * (decimal)totalTaxEfficiency;
+
+        // Trade contracts processing
+        decimal tradeExportRevenue = 0m;
+        decimal tradeImportExpenses = 0m;
+        var tradeResourceNetDelta = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (partnerId, stance) in country.DiplomaticRelations)
+        {
+            if (stance.NonAggressionPactUntil.HasValue && stance.NonAggressionPactUntil.Value <= session.Clock.CurrentDate)
+            {
+                stance.NonAggressionPactUntil = null;
+            }
+
+            var expiredContracts = new List<TradeContract>();
+            foreach (var contract in stance.ActiveTradeContracts)
+            {
+                if (contract.ExpiryDate.HasValue && contract.ExpiryDate.Value <= session.Clock.CurrentDate)
+                {
+                    expiredContracts.Add(contract);
+                    continue;
+                }
+
+                if (string.Equals(contract.ExporterCountryId, CountryId, StringComparison.OrdinalIgnoreCase))
+                {
+                    tradeExportRevenue += contract.MonthlyPayment;
+                    tradeResourceNetDelta[contract.ResourceType] = tradeResourceNetDelta.GetValueOrDefault(contract.ResourceType, 0.0) - contract.MonthlyQuantity;
+                }
+                else if (string.Equals(contract.ImporterCountryId, CountryId, StringComparison.OrdinalIgnoreCase))
+                {
+                    tradeImportExpenses += contract.MonthlyPayment;
+                    tradeResourceNetDelta[contract.ResourceType] = tradeResourceNetDelta.GetValueOrDefault(contract.ResourceType, 0.0) + contract.MonthlyQuantity;
+                }
+            }
+
+            foreach (var exp in expiredContracts)
+            {
+                stance.ActiveTradeContracts.Remove(exp);
+            }
+        }
+
+        decimal grossRevenue = (rawRevenue * (decimal)totalTaxEfficiency) + tradeExportRevenue;
 
         if (country.IdeologyCooldownMonths > 0)
         {
@@ -76,13 +116,23 @@ public class ExecuteMonthlyLedgerCommand : ICommand
         int barracks = country.Facilities.GetValueOrDefault("Barracks", 10);
         decimal defenseExpenses = 200_000_000m + (barracks * 5_000_000m);
 
+        decimal militaryUnitUpkeep = country.CalculateMonthlyMilitaryUpkeep(session.MilitaryRegistry);
+        decimal presidentialProtectionCost = country.PresidentialProtectionLevel switch
+        {
+            FundingLevel.Low => 20_000_000m,
+            FundingLevel.Medium => 50_000_000m,
+            FundingLevel.High => 150_000_000m,
+            FundingLevel.Maximum => 300_000_000m,
+            _ => 50_000_000m
+        };
+
         int totalFacilities = country.Facilities.Values.Sum();
         decimal facilityUpkeepExpenses = totalFacilities * 500_000m;
 
         decimal monthlyInterestRate = country.GetMonthlyInterestRate();
         decimal debtInterestExpenses = country.Debt * monthlyInterestRate;
 
-        decimal grossExpenses = ministryExpenses + ministerSalaries + civilAdminExpenses + defenseExpenses + facilityUpkeepExpenses + debtInterestExpenses + policyUpkeep;
+        decimal grossExpenses = ministryExpenses + ministerSalaries + civilAdminExpenses + defenseExpenses + facilityUpkeepExpenses + debtInterestExpenses + policyUpkeep + tradeImportExpenses + militaryUnitUpkeep + presidentialProtectionCost;
 
         // 3. Invariant Net Calculation:
         decimal startingTreasury = country.Treasury;
@@ -93,6 +143,7 @@ public class ExecuteMonthlyLedgerCommand : ICommand
         country.CreditRating = country.CalculateCreditRating();
 
         // 4. Resource updates (Facilities production minus civilian consumption):
+
         int farms = country.Facilities.GetValueOrDefault("Farms", 10);
         int powerPlants = country.Facilities.GetValueOrDefault("PowerPlants", 10);
         int mines = country.Facilities.GetValueOrDefault("Mines", 10);
@@ -118,12 +169,12 @@ public class ExecuteMonthlyLedgerCommand : ICommand
         double goodsConsumed = (country.Population / 1_000_000.0) * 120.0;
 
         var current = country.Stockpiles;
-        double nextFood = Math.Max(0.0, current.Food + foodProduced - foodConsumed);
-        double nextEnergy = Math.Max(0.0, current.Energy + energyProduced - energyConsumed);
-        double nextIron = Math.Max(0.0, current.Iron + ironProduced - ironConsumedByFactories);
-        double nextOil = Math.Max(0.0, current.Oil + oilProduced - oilConsumed);
-        double nextUranium = Math.Max(0.0, current.Uranium + uraniumProduced - uraniumConsumed);
-        double nextGoods = Math.Max(0.0, current.ConsumerGoods + goodsProduced - goodsConsumed);
+        double nextFood = Math.Max(0.0, current.Food + foodProduced - foodConsumed + tradeResourceNetDelta.GetValueOrDefault("Food", 0.0));
+        double nextEnergy = Math.Max(0.0, current.Energy + energyProduced - energyConsumed + tradeResourceNetDelta.GetValueOrDefault("Energy", 0.0));
+        double nextIron = Math.Max(0.0, current.Iron + ironProduced - ironConsumedByFactories + tradeResourceNetDelta.GetValueOrDefault("Iron", 0.0));
+        double nextOil = Math.Max(0.0, current.Oil + oilProduced - oilConsumed + tradeResourceNetDelta.GetValueOrDefault("Oil", 0.0));
+        double nextUranium = Math.Max(0.0, current.Uranium + uraniumProduced - uraniumConsumed + tradeResourceNetDelta.GetValueOrDefault("Uranium", 0.0));
+        double nextGoods = Math.Max(0.0, current.ConsumerGoods + goodsProduced - goodsConsumed + tradeResourceNetDelta.GetValueOrDefault("ConsumerGoods", 0.0));
 
         country.Stockpiles = new ResourceStockpile(
             Food: nextFood,
@@ -155,6 +206,7 @@ public class ExecuteMonthlyLedgerCommand : ICommand
             CorporateTaxRevenue = corporateTaxRevenue,
             VatRevenue = vatRevenue,
             CommercialFacilityRevenue = commercialRevenue,
+            TradeExportRevenue = tradeExportRevenue,
             GrossRevenue = grossRevenue,
             TaxEfficiency = totalTaxEfficiency,
 
@@ -162,10 +214,13 @@ public class ExecuteMonthlyLedgerCommand : ICommand
             MinisterSalaries = ministerSalaries,
             CivilAdministrationExpenses = civilAdminExpenses,
             DefenseUpkeepExpenses = defenseExpenses,
+            MilitaryUnitUpkeepExpenses = militaryUnitUpkeep,
             FacilityUpkeepExpenses = facilityUpkeepExpenses,
             DebtInterestExpenses = debtInterestExpenses,
             ActivePolicyUpkeepExpenses = policyUpkeep,
+            TradeImportExpenses = tradeImportExpenses,
             GrossExpenses = grossExpenses,
+
 
             NetBalance = netDelta,
             StartingTreasury = startingTreasury,

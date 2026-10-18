@@ -34,6 +34,12 @@ public class CountryState
     // Active Economic Policies
     public List<string> ActivePolicies { get; set; } = new();
 
+    // Internal Security & Espionage
+    public FundingLevel PresidentialProtectionLevel { get; set; } = FundingLevel.Medium;
+
+    // Military Inventory (Unit ID -> Count)
+    public Dictionary<string, int> MilitaryUnits { get; set; } = new();
+
     // Fiscal Ledger & Trend History
     public List<MonthlyBudgetReport> BudgetHistory { get; set; } = new();
     public MonthlyBudgetReport? LastBudgetReport { get; set; }
@@ -54,6 +60,7 @@ public class CountryState
         ["OilWells"] = 20,
         ["UraniumMines"] = 5
     };
+
 
     public decimal CalculateMonthlyGdp()
     {
@@ -104,6 +111,50 @@ public class CountryState
         return stance;
     }
 
+    public int GetTotalMilitaryUnits() => MilitaryUnits.Values.Sum();
+
+    public int CalculateTotalCombatPower(Military.MilitaryUnitRegistry? registry = null)
+    {
+        registry ??= Military.MilitaryUnitRegistry.CreateDefaultCatalog();
+        int total = 0;
+        foreach (var (unitId, count) in MilitaryUnits)
+        {
+            if (registry.TryGet(unitId, out var def) && def != null)
+            {
+                total += def.CombatPower * count;
+            }
+        }
+        return total;
+    }
+
+    public int CalculateTotalDefensePower(Military.MilitaryUnitRegistry? registry = null)
+    {
+        registry ??= Military.MilitaryUnitRegistry.CreateDefaultCatalog();
+        int total = 0;
+        foreach (var (unitId, count) in MilitaryUnits)
+        {
+            if (registry.TryGet(unitId, out var def) && def != null)
+            {
+                total += def.DefensePower * count;
+            }
+        }
+        return total;
+    }
+
+    public decimal CalculateMonthlyMilitaryUpkeep(Military.MilitaryUnitRegistry? registry = null)
+    {
+        registry ??= Military.MilitaryUnitRegistry.CreateDefaultCatalog();
+        decimal total = 0m;
+        foreach (var (unitId, count) in MilitaryUnits)
+        {
+            if (registry.TryGet(unitId, out var def) && def != null)
+            {
+                total += def.MonthlyUpkeepTreasury * count;
+            }
+        }
+        return total;
+    }
+
     public static CountryState CreateIndiaDefault()
     {
         var india = new CountryState
@@ -118,7 +169,23 @@ public class CountryState
             IncomeTaxRate = 0.20,
             CorporateTaxRate = 0.25,
             VatRate = 0.15,
-            Stockpiles = ResourceStockpile.DefaultStartingStockpile()
+            PresidentialProtectionLevel = FundingLevel.Medium,
+            Stockpiles = ResourceStockpile.DefaultStartingStockpile(),
+            MilitaryUnits = new Dictionary<string, int>
+            {
+                ["infantry_division"] = 250,
+                ["main_battle_tank"] = 50,
+                ["artillery_corps"] = 35,
+                ["mechanized_infantry"] = 30,
+                ["multirole_fighter"] = 40,
+                ["attack_helicopter"] = 20,
+                ["strategic_bomber"] = 5,
+                ["air_defense_system"] = 20,
+                ["recon_drone_fleet"] = 25,
+                ["guided_missile_destroyer"] = 10,
+                ["attack_submarine"] = 6,
+                ["aircraft_carrier"] = 2
+            }
         };
 
         foreach (MinistryType ministry in Enum.GetValues<MinistryType>())
@@ -129,3 +196,4 @@ public class CountryState
         return india;
     }
 }
+

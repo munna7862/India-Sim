@@ -41,6 +41,20 @@ public record CountryDefinition(
             state.Ministries[ministry] = new MinistryState(ministry, null, FundingLevel.Medium);
         }
 
+        int barracks = Facilities.GetValueOrDefault("Barracks", 10);
+        state.MilitaryUnits = new Dictionary<string, int>
+        {
+            ["infantry_division"] = barracks * 15,
+            ["main_battle_tank"] = barracks * 3,
+            ["artillery_corps"] = barracks * 2,
+            ["mechanized_infantry"] = barracks * 2,
+            ["multirole_fighter"] = barracks * 2,
+            ["attack_helicopter"] = barracks * 1,
+            ["air_defense_system"] = barracks * 1,
+            ["guided_missile_destroyer"] = Math.Max(1, barracks / 2)
+        };
+
         return state;
     }
 }
+
