@@ -24,7 +24,14 @@ public class ExecuteMonthlyLedgerCommand : ICommand
         decimal incomeTaxRevenue = grossGdpPerMonth * (decimal)country.IncomeTaxRate * 0.40m;
         decimal corporateTaxRevenue = grossGdpPerMonth * (decimal)country.CorporateTaxRate * 0.35m;
         decimal vatRevenue = grossGdpPerMonth * (decimal)country.VatRate * 0.25m;
-        decimal totalRevenue = incomeTaxRevenue + corporateTaxRevenue + vatRevenue;
+        decimal rawRevenue = incomeTaxRevenue + corporateTaxRevenue + vatRevenue;
+        var ideologyDef = IdeologyDefinition.Get(country.Ideology);
+        decimal totalRevenue = rawRevenue * (decimal)ideologyDef.TaxEfficiencyMultiplier;
+
+        if (country.IdeologyCooldownMonths > 0)
+        {
+            country.IdeologyCooldownMonths--;
+        }
 
         // 2. Calculate Monthly Expenses:
         decimal totalExpenses = 0m;

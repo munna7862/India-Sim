@@ -37,4 +37,21 @@ public record MinistryState(
     MinistryType Type,
     Minister? ActiveMinister,
     FundingLevel Funding
-);
+)
+{
+    public double CalculateEfficiency()
+    {
+        double competence = ActiveMinister?.Competence ?? 0.70;
+        double fundingMultiplier = Funding switch
+        {
+            FundingLevel.Zero => 0.0,
+            FundingLevel.Low => 0.70,
+            FundingLevel.Medium => 1.0,
+            FundingLevel.High => 1.20,
+            FundingLevel.Maximum => 1.35,
+            _ => 1.0
+        };
+        return Math.Clamp(competence * fundingMultiplier, 0.0, 1.0);
+    }
+}
+

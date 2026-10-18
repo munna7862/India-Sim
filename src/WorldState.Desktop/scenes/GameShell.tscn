@@ -214,3 +214,171 @@ theme_override_colors/font_color = Color(0.612, 0.639, 0.686, 1)
 theme_override_font_sizes/font_size = 12
 text = "[Space] Pause/Resume  •  [1] 1x Speed  •  [2] 2x Speed  •  [3] 3x Speed  •  [Esc] Back to Menu"
 vertical_alignment = 1
+
+[node name="CabinetPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 72.0
+offset_top = 64.0
+offset_right = -16.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CabinetPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="CabinetPanel/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="CabinetPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "CABINET MINISTRIES & STATE IDEOLOGY"
+
+[node name="CloseButton" type="Button" parent="CabinetPanel/VBox/Header"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "✕"
+
+[node name="IdeologyHBox" type="HBoxContainer" parent="CabinetPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="IdeologyLabel" type="Label" parent="CabinetPanel/VBox/IdeologyHBox"]
+layout_mode = 2
+text = "State Ideology: Constitutional Democracy"
+
+[node name="ChangeIdeologyBtn" type="Button" parent="CabinetPanel/VBox/IdeologyHBox"]
+layout_mode = 2
+text = "Reforms ($1.0B)"
+
+[node name="Scroll" type="ScrollContainer" parent="CabinetPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MinistryList" type="VBoxContainer" parent="CabinetPanel/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="TasksPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 72.0
+offset_top = 64.0
+offset_right = -16.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="TasksPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="TasksPanel/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="TasksPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "PRESIDENTIAL OBJECTIVES & TASKS"
+
+[node name="CloseButton" type="Button" parent="TasksPanel/VBox/Header"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "✕"
+
+[node name="SummaryLabel" type="Label" parent="TasksPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.231, 0.51, 0.965, 1)
+text = "Objectives Progress: 0/8 Completed"
+
+[node name="Scroll" type="ScrollContainer" parent="TasksPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TasksList" type="VBoxContainer" parent="TasksPanel/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="EmergencyDialog" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -220.0
+offset_right = 340.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="EmergencyDialog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="EmergencyHeader" type="Label" parent="EmergencyDialog/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.937, 0.267, 0.267, 1)
+theme_override_font_sizes/font_size = 20
+text = "🚨 NATIONAL EMERGENCY"
+
+[node name="EventTitle" type="Label" parent="EmergencyDialog/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Emergency Event Title"
+
+[node name="EventDescription" type="Label" parent="EmergencyDialog/VBox"]
+layout_mode = 2
+autowrap_mode = 2
+text = "Detailed briefing on the ongoing domestic crisis or development requiring presidential intervention."
+
+[node name="HSeparator" type="HSeparator" parent="EmergencyDialog/VBox"]
+layout_mode = 2
+
+[node name="ChoicesContainer" type="VBoxContainer" parent="EmergencyDialog/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+

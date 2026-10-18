@@ -15,6 +15,10 @@ public class CountryState
     public double CorporateTaxRate { get; set; } = 0.25;
     public double VatRate { get; set; } = 0.15;
 
+    // Government & Ideology
+    public IdeologyType Ideology { get; set; } = IdeologyType.ConstitutionalDemocracy;
+    public int IdeologyCooldownMonths { get; set; } = 0;
+
     // Cabinet ministries
     public Dictionary<MinistryType, MinistryState> Ministries { get; set; } = new();
 

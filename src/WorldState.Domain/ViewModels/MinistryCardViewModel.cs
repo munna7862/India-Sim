@@ -8,8 +8,11 @@ public record MinistryCardViewModel(
     string MinisterName,
     string CompetencePercent,
     string MonthlySalaryFormatted,
+    FundingLevel Funding,
     string FundingLevelName,
-    string OperationalCostFormatted
+    string OperationalCostFormatted,
+    string EfficiencyPercent,
+    bool IsVacant
 )
 {
     public static MinistryCardViewModel FromState(MinistryState state)
@@ -27,6 +30,7 @@ public record MinistryCardViewModel(
             : "$0 / mo";
 
         decimal operationalCost = (int)state.Funding * 1_000_000m;
+        double efficiency = state.CalculateEfficiency() * 100.0;
 
         return new MinistryCardViewModel(
             Type: state.Type,
@@ -34,12 +38,15 @@ public record MinistryCardViewModel(
             MinisterName: ministerName,
             CompetencePercent: competence,
             MonthlySalaryFormatted: salary,
+            Funding: state.Funding,
             FundingLevelName: state.Funding.ToString(),
-            OperationalCostFormatted: $"{HudViewModel.FormatCurrency(operationalCost)} / mo"
+            OperationalCostFormatted: $"{HudViewModel.FormatCurrency(operationalCost)} / mo",
+            EfficiencyPercent: $"{efficiency:F0}%",
+            IsVacant: state.ActiveMinister == null
         );
     }
 
-    private static string FormatMinistryName(MinistryType type) => type switch
+    public static string FormatMinistryName(MinistryType type) => type switch
     {
         MinistryType.SecurityIntelligence => "Security & Intelligence",
         MinistryType.IndustryConstruction => "Industry & Construction",
