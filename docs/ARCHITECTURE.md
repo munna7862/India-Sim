@@ -15,7 +15,7 @@
 - `src/WorldState.Desktop/`: Godot .NET scenes, map, UI, input and packaging.
 - `content/`: countries, institutions, actions, tasks, events and scenario definitions.
 - `tools/ContentValidator/`: stable ID, reference and schema checks.
-- `agents/`: coordinator and specialist instructions.
+- `.agents/`: coordinator and specialist instructions.
 - `plans/`: phases and sprints.
 - `docs/research/`: parity matrix and reference observations.
 
