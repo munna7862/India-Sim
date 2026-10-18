@@ -11,6 +11,9 @@ A Windows desktop, clean-room re-implementation of the geopolitical presidential
 - **Phase Index (Phases 00–09):** [`plans/PHASE-INDEX.md`](file:///c:/Workspace/India-Sim/plans/PHASE-INDEX.md)
 - **Feature Parity Matrix:** [`docs/research/FEATURE-PARITY-MATRIX.md`](file:///c:/Workspace/India-Sim/docs/research/FEATURE-PARITY-MATRIX.md)
 - **Clean-Room & Legal Policy:** [`docs/legal/CLEAN-ROOM-POLICY.md`](file:///c:/Workspace/India-Sim/docs/legal/CLEAN-ROOM-POLICY.md)
+- **Release Notes (v1.0.0):** [`RELEASE-NOTES-v1.0.0.md`](file:///c:/Workspace/India-Sim/RELEASE-NOTES-v1.0.0.md)
+- **Desktop Controls Guide:** [`docs/guides/DESKTOP-CONTROLS-GUIDE.md`](file:///c:/Workspace/India-Sim/docs/guides/DESKTOP-CONTROLS-GUIDE.md)
+- **Crash & Diagnostics Guide:** [`docs/guides/CRASH-AND-DIAGNOSTICS-GUIDE.md`](file:///c:/Workspace/India-Sim/docs/guides/CRASH-AND-DIAGNOSTICS-GUIDE.md)
 - **Asset & Data Provenance:** [`docs/legal/ASSET-AND-DATA-PROVENANCE.md`](file:///c:/Workspace/India-Sim/docs/legal/ASSET-AND-DATA-PROVENANCE.md)
 - **V2 Deferred Backlog:** [`docs/V2-BACKLOG.md`](file:///c:/Workspace/India-Sim/docs/V2-BACKLOG.md)
 
@@ -21,10 +24,11 @@ A Windows desktop, clean-room re-implementation of the geopolitical presidential
 ```text
 src/
 ├── WorldState.Domain/       # Pure .NET 8 LTS: authoritative rules, clock, command pipeline
-├── WorldState.Domain.Tests/ # xUnit test suite (unit tests, invariants, save round-trip)
+├── WorldState.Domain.Tests/ # xUnit test suite (218 tests: unit, integration, benchmarks)
 └── WorldState.Desktop/      # Godot 4 .NET client: UI, map presentation, input, audio
-content/                     # Validated JSON data definitions (countries, tasks, ministries)
+content/                     # Validated JSON data definitions (countries, tasks, events, units)
 tools/ContentValidator/      # Headless schema and data validator CLI
+dist/                        # Packaged Windows desktop standalone distributions (.zip & SHA256)
 ```
 
 ---
@@ -42,7 +46,13 @@ Run the automated build script from the repository root:
 .\build.ps1
 ```
 
-Or execute directly via the .NET CLI:
+### Windows Desktop Packaging
+To create a standalone redistributable package with versioning, SHA256 checksums, and documentation:
+```powershell
+.\package.ps1 -Configuration Release -Version 1.0.0
+```
+
+### Direct .NET CLI Execution
 ```powershell
 # Restore & build solution in Release configuration
 dotnet restore src/WorldState.sln

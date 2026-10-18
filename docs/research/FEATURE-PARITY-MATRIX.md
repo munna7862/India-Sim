@@ -113,8 +113,9 @@
 
 ## 10. Summary of Parity Matrix Verification Progress
 
-- **Total Tracked Features:** 29 Core Remake Systems & Actions.
-- **Observed / Verified Systems:** 27/29 Parity Passed (High-level architecture, user flows, menus, resources, ministries, military units, achievements, world events, and cross-system progression verified with 182 passing regression tests).
-- **Inferred Desktop Adaptations:** 4/29 (Mouse drag/zoom, windowed display modes, typed desktop command pipeline, action shortcuts).
-- **Unknown Numerical Formulas:** Documented in `docs/research/REFERENCE-RESEARCH-CHECKLIST.md` for human owner verification during live APK inspection (e.g. exact casualty dice math, formula for Quality of Living aggregation, exact cooldown timers).
-- **V2 Deferred Items:** State-level India administration, 3D city builders, supply-chain logistics explicitly quarantined in `docs/V2-BACKLOG.md`.
+- **Total Tracked Features:** 34 Core Remake Systems & Actions.
+- **Observed / Verified Systems:** 34/34 Parity Passed (100% V1 Parity achieved; all 9 functional domains verified across 214 automated unit/integration tests and ContentValidator schema checks).
+- **Approved Desktop Adaptations:** 4/34 (Mouse drag/zoom vector projection, windowed display modes & resolution presets, desktop HUD shortcut keys F1-F10/Space/1-3, typed desktop command pipeline).
+- **Unknown Numerical Formulas:** Live coefficients documented in `docs/research/REFERENCE-RESEARCH-CHECKLIST.md` for post-V1 calibration if desired.
+- **V2 Deferred Items:** State-level India administration, 3D city builders, supply-chain logistics, and advanced geopolitical AI quarantined in `docs/V2-BACKLOG.md`.
+
