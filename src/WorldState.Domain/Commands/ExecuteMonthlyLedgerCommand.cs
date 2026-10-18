@@ -39,6 +39,10 @@ public class ExecuteMonthlyLedgerCommand : ICommand
         // Baseline defense and civil administration ($500M)
         totalExpenses += 500_000_000m;
 
+        // Debt service interest (0.5% monthly = 6% per annum)
+        decimal debtInterest = country.Debt * 0.005m;
+        totalExpenses += debtInterest;
+
         // 3. Invariant net calculation:
         decimal netDelta = totalRevenue - totalExpenses;
         country.Treasury += netDelta;
@@ -65,6 +69,16 @@ public class ExecuteMonthlyLedgerCommand : ICommand
             Uranium: current.Uranium,
             ConsumerGoods: current.ConsumerGoods
         );
+
+        session.AddEvent(new GameEvent(
+            Id: Guid.NewGuid().ToString("N"),
+            Date: session.Clock.CurrentDate,
+            Title: "Monthly Ledger Settled",
+            Message: $"{country.Name} financial ledger: Revenue ${totalRevenue / 1_000_000m:F1}M, Expenses ${totalExpenses / 1_000_000m:F1}M (Net: {(netDelta >= 0 ? "+" : "")}${netDelta / 1_000_000m:F1}M). Treasury: ${country.Treasury / 1_000_000m:F1}M.",
+            Category: EventCategory.Economy,
+            Severity: country.Treasury < 0m ? EventSeverity.Warning : EventSeverity.Info,
+            ActorCountryId: CountryId
+        ));
 
         return CommandResult.Success();
     }

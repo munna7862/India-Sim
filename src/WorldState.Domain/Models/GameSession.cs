@@ -10,6 +10,17 @@ public class GameSession
     public string Difficulty { get; set; } = "Standard";
     public SimulationClock Clock { get; set; } = new();
     public Dictionary<string, CountryState> Countries { get; set; } = new();
+    public List<GameEvent> Events { get; set; } = new();
+    public Dictionary<string, GameTask> Tasks { get; set; } = new();
+    public List<string> ClaimedRewardIds { get; set; } = new();
+    public List<TimedOperation> TimedOperations { get; set; } = new();
+    public CooldownTracker Cooldowns { get; set; } = new();
+
+    public void AddEvent(GameEvent gameEvent)
+    {
+        ArgumentNullException.ThrowIfNull(gameEvent);
+        Events.Add(gameEvent);
+    }
 
     public CountryState? GetPlayerCountry() =>
         Countries.TryGetValue(PlayerCountryId, out var state) ? state : null;

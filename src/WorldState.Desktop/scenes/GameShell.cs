@@ -1,6 +1,8 @@
 using Godot;
+using WorldState.Domain.Commands;
 using WorldState.Domain.Models;
 using WorldState.Domain.Navigation;
+using WorldState.Domain.Services;
 using WorldState.Domain.ViewModels;
 
 namespace WorldState.Desktop.Scenes;
@@ -9,6 +11,8 @@ public partial class GameShell : Control
 {
     public static GameSession? ActiveSession { get; set; }
     private GameSession _session = ActiveSession ?? GameSession.CreateNewGame("IND");
+    private SimulationEngine _engine = null!;
+    private readonly SaveManager _saveManager = new();
     private readonly NavigationService _nav = new();
 
     private Label? _dateLabel;
@@ -28,6 +32,12 @@ public partial class GameShell : Control
         {
             _session = ActiveSession;
         }
+
+        _engine = new SimulationEngine(_session);
+        _engine.OnMonthRollover += date =>
+        {
+            _saveManager.AutoSave(_session);
+        };
 
         _dateLabel = GetNodeOrNull<Label>("TopBar/HBox/DateLabel");
         _treasuryLabel = GetNodeOrNull<Label>("TopBar/HBox/TreasuryLabel");
@@ -52,7 +62,7 @@ public partial class GameShell : Control
 
     public override void _Process(double delta)
     {
-        _session.Clock.Tick(delta);
+        _engine.Tick(delta);
         RefreshHud();
     }
 
@@ -76,6 +86,21 @@ public partial class GameShell : Control
                     break;
                 case Key.Key3:
                     SetSpeed(ClockSpeed.Ultra);
+                    GetViewport().SetInputAsHandled();
+                    break;
+                case Key.F5:
+                    _saveManager.QuickSave(_session);
+                    GetViewport().SetInputAsHandled();
+                    break;
+                case Key.F9:
+                    var loadResult = _saveManager.QuickLoad();
+                    if (loadResult.IsSuccess && loadResult.Session != null)
+                    {
+                        _session = loadResult.Session;
+                        _engine = new SimulationEngine(_session);
+                        _engine.OnMonthRollover += date => _saveManager.AutoSave(_session);
+                        RefreshHud();
+                    }
                     GetViewport().SetInputAsHandled();
                     break;
                 case Key.Escape:

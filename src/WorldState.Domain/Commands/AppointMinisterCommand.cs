@@ -46,6 +46,16 @@ public class AppointMinisterCommand : ICommand
         country.Treasury -= HiringFee;
         country.Ministries[Ministry] = ministryState with { ActiveMinister = Candidate };
 
+        session.AddEvent(new GameEvent(
+            Id: Guid.NewGuid().ToString("N"),
+            Date: session.Clock.CurrentDate,
+            Title: "Minister Appointed",
+            Message: $"{Candidate.Name} appointed as Minister of {Ministry} for {country.Name} (Hiring fee: ${HiringFee / 1_000_000m:F1}M).",
+            Category: EventCategory.Government,
+            Severity: EventSeverity.Info,
+            ActorCountryId: CountryId
+        ));
+
         return CommandResult.Success();
     }
 }
