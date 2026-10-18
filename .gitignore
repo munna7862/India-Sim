@@ -1,0 +1,38 @@
+# .gitignore for India Sim Desktop Remake (Godot 4 .NET / C#)
+
+# --- Clean-Room Reference Exclusions ---
+# Private gameplay captures, reference screenshots, APK extractions, and teardowns
+# must NEVER be committed to version control or packaged in game builds.
+reference_media/
+reference_captures/
+scratch/reference/
+*.apk
+*.xapk
+*.obb
+*.decompiled/
+
+# --- .NET & C# Build Artifacts ---
+bin/
+obj/
+[Bb]uild/
+[Bb]uilds/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+.vscode/
+*.DotSettings.user
+
+# --- Godot 4 Artifacts ---
+.godot/
+*.translation
+export_presets.cfg
+
+# --- OS & Environment ---
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.tmp
+*.bak

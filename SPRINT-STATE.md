@@ -1,27 +1,28 @@
 # Sprint State
 
-- Project: India Simulator 2-inspired desktop remake (working title: India Sim Remake)
-- Status: Phase 00 in progress; Sprint 00-01 completed and ready for human review.
+- Project: Rashtra: Sovereign Republic (Desktop Remake)
+- Status: Phase 00 in progress; Sprint 00-02 completed; ready for Sprint 00-03.
 - Active phase: 00 (Reference Research, Scope & Clean-Room Design)
-- Active sprint: 00-01 (Build the reference feature inventory)
-- Sprint status: Completed (Outputs verified and documented; awaiting human review)
-- Last verified commit: 8c45345 (feat(agents): add Antigravity native workspace skills for all 11 personas)
+- Active sprint: 00-02 (Clean-room design and legal boundaries) -> Completed; Next: 00-03 (V1 acceptance criteria and technical spike)
+- Sprint status: Completed (Outputs verified and documented; ready for Sprint 00-03)
+- Last verified commit: 27af9c6 (chore: remove redundant agents/ folder in favor of native .agents/skills/)
 - Last CI run: None
 
 ## Current objective
-Establish the verified V1 reference feature inventory, screen flows, and parity matrix while enforcing clean-room boundaries and distinguishing verified observations from unknowns.
+Prove the desktop technical stack, validate .NET 8 LTS integration, define measurable V1 acceptance gates, and prepare for Phase 01 bootstrap.
 
 ## Blockers / decisions
 - Reference Game Access Limitation: Direct Android APK execution is not supported natively in this Windows agent environment without an emulator. Publicly verified developer documentation, store descriptions, and gameplay captures were synthesized into `REFERENCE-INVENTORY.md` and `FEATURE-PARITY-MATRIX.md`. A companion checklist (`docs/research/REFERENCE-RESEARCH-CHECKLIST.md`) is provided for the human owner to log live-session numerical coefficients.
-- Technical Spike (Sprint 00-03): Pinned Godot 4 .NET release and .NET SDK versions will be validated before core engine development begins.
-- Map Data Licensing: World vector boundary datasets must be verified for permissive commercial/clean-room licensing prior to Phase 02.
+- Technical Spike (Sprint 00-03): Pinned Godot 4 .NET release and .NET 8 SDK LTS compatibility validation underway.
+- Map Data Licensing: Resolved in Sprint 00-02 via ADR-002: Natural Earth Admin 0 Public Domain vector datasets selected.
+- Branding & Clean-Room Policy: Resolved in Sprint 00-02 via `docs/legal/CLEAN-ROOM-POLICY.md` and working title "Rashtra: Sovereign Republic".
 
 ## Sprint ledger
 | Sprint | Status | Evidence |
 |---|---|---|
 | 00-01 | Completed | `docs/research/REFERENCE-INVENTORY.md`, `docs/research/FEATURE-PARITY-MATRIX.md`, `docs/research/REFERENCE-RESEARCH-CHECKLIST.md` |
-| 00-02 | Not started | Depends on 00-01 approval |
-| 00-03 | Not started | None |
+| 00-02 | Completed | `docs/legal/CLEAN-ROOM-POLICY.md`, `docs/legal/ASSET-AND-DATA-PROVENANCE.md`, `docs/adr/ADR-002-clean-room-and-licensing.md`, `.gitignore` |
+| 00-03 | Ready / Next | `plans/sprints/00-03.md` |
 | 01-01 | Not started | None |
 | 01-02 | Not started | None |
 | 01-03 | Not started | None |
