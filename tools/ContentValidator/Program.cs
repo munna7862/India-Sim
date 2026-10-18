@@ -225,5 +225,35 @@ if (Directory.Exists(eventsDir))
     }
 }
 
-Console.WriteLine($"\nValidation Complete: {validatedCountries} countries, {validatedScenarios} scenarios, {validatedMaps} map datasets, {validatedTasks} tasks, {validatedEvents} events. Errors: {errorCount}.");
+// 6. Validate Economic Policy Definitions
+string policiesDir = Path.Combine(contentDir, "policies");
+int validatedPolicies = 0;
+if (Directory.Exists(policiesDir))
+{
+    Console.WriteLine("\n--- Validating Economic Policy Definitions ---");
+    string[] policyFiles = Directory.GetFiles(policiesDir, "*.json");
+    foreach (string file in policyFiles)
+    {
+        Console.WriteLine($"Validating policies: {Path.GetFileName(file)}...");
+        try
+        {
+            string json = File.ReadAllText(file);
+            var policyRegistry = new WorldState.Domain.Economy.EconomicPolicyRegistry();
+            policyRegistry.LoadFromJson(json);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"  [OK] Valid policies dataset: {Path.GetFileName(file)} with {policyRegistry.Policies.Count} policy definitions.");
+            Console.ResetColor();
+            validatedPolicies += policyRegistry.Policies.Count;
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [ERROR] Policy validation failure: {ex.Message}");
+            Console.ResetColor();
+            errorCount++;
+        }
+    }
+}
+
+Console.WriteLine($"\nValidation Complete: {validatedCountries} countries, {validatedScenarios} scenarios, {validatedMaps} map datasets, {validatedTasks} tasks, {validatedEvents} events, {validatedPolicies} policies. Errors: {errorCount}.");
 return errorCount == 0 ? 0 : 1;

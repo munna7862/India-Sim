@@ -18,6 +18,9 @@ public class GameSession
     public ActiveEventPrompt? PendingEvent { get; set; }
     public Dictionary<string, int> EventCooldowns { get; set; } = new();
 
+    [System.Text.Json.Serialization.JsonIgnore]
+    public Economy.EconomicPolicyRegistry? PolicyRegistry { get; set; }
+
     public void AddEvent(GameEvent gameEvent)
     {
         ArgumentNullException.ThrowIfNull(gameEvent);

@@ -17,7 +17,9 @@ public class ConstructFacilityCommand : ICommand
             ["Factories"] = (300_000_000m, 1_500.0),
             ["Hospitals"] = (200_000_000m, 500.0),
             ["Schools"] = (150_000_000m, 500.0),
-            ["Barracks"] = (250_000_000m, 1_000.0)
+            ["Barracks"] = (250_000_000m, 1_000.0),
+            ["OilWells"] = (350_000_000m, 1_500.0),
+            ["UraniumMines"] = (600_000_000m, 3_000.0)
         };
 
     public ConstructFacilityCommand(string countryId, string facilityType, int quantity = 1)

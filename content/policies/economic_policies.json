@@ -1,0 +1,69 @@
+[
+  {
+    "id": "agricultural_subsidies",
+    "name": "Agricultural Subsidies & Modernization",
+    "description": "Subsidize agricultural machinery, high-yield seeds, and rural irrigation to secure food independence.",
+    "category": "Agriculture",
+    "upfrontCost": 500000000.0,
+    "monthlyUpkeep": 200000000.0,
+    "farmEfficiencyMultiplier": 0.25,
+    "approvalModifier": 3.0,
+    "livingStandardModifier": 2.0
+  },
+  {
+    "id": "industrial_modernization",
+    "name": "Industrial Automation & Modernization",
+    "description": "Equip domestic factories with advanced robotics and automation, boosting high-value goods manufacturing.",
+    "category": "Industry",
+    "upfrontCost": 1000000000.0,
+    "monthlyUpkeep": 400000000.0,
+    "factoryEfficiencyMultiplier": 0.30,
+    "gdpMultiplier": 0.05,
+    "taxEfficiencyModifier": 0.05,
+    "livingStandardModifier": 2.0
+  },
+  {
+    "id": "green_energy_transition",
+    "name": "Renewable Clean Energy Transition",
+    "description": "Deploy grid-scale solar and wind arrays to lower power generation costs and improve urban air quality.",
+    "category": "Energy",
+    "upfrontCost": 1500000000.0,
+    "monthlyUpkeep": 350000000.0,
+    "energyEfficiencyMultiplier": 0.20,
+    "livingStandardModifier": 4.0,
+    "approvalModifier": 2.0
+  },
+  {
+    "id": "fdi_promotion_zones",
+    "name": "Special Economic Zones & FDI Incentives",
+    "description": "Create tariff-free manufacturing export hubs that attract global corporations and direct investments.",
+    "category": "Trade",
+    "upfrontCost": 800000000.0,
+    "monthlyUpkeep": 250000000.0,
+    "gdpMultiplier": 0.08,
+    "taxEfficiencyModifier": 0.08,
+    "stabilityModifier": 1.0
+  },
+  {
+    "id": "national_infrastructure_initiative",
+    "name": "National Freight & Logistics Corridors",
+    "description": "Construct dedicated high-capacity freight rail and port expressways, accelerating commodity transit.",
+    "category": "Infrastructure",
+    "upfrontCost": 2000000000.0,
+    "monthlyUpkeep": 500000000.0,
+    "gdpMultiplier": 0.06,
+    "livingStandardModifier": 5.0,
+    "stabilityModifier": 3.0
+  },
+  {
+    "id": "fiscal_austerity_program",
+    "name": "Fiscal Austerity & Civil Expenditure Cap",
+    "description": "Cap administrative operational spending and freeze discretionary allowances to accelerate debt reduction.",
+    "category": "Fiscal",
+    "upfrontCost": 100000000.0,
+    "monthlyUpkeep": -300000000.0,
+    "approvalModifier": -5.0,
+    "livingStandardModifier": -2.0,
+    "stabilityModifier": -2.0
+  }
+]

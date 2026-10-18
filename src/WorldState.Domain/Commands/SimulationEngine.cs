@@ -15,6 +15,7 @@ public class SimulationEngine
     public SimulationEngine(GameSession session)
     {
         _session = session ?? throw new ArgumentNullException(nameof(session));
+        _session.PolicyRegistry ??= Economy.EconomicPolicyRegistry.CreateDefaultCatalog();
         WireClockEvents();
     }
 
@@ -106,6 +107,18 @@ public class SimulationEngine
     {
         get => _eventRegistry ??= Events.DomesticEventRegistry.CreateDefaultCatalog();
         set => _eventRegistry = value;
+    }
+
+    private Economy.EconomicPolicyRegistry? _policyRegistry;
+
+    public Economy.EconomicPolicyRegistry PolicyRegistry
+    {
+        get => _policyRegistry ??= _session.PolicyRegistry ?? Economy.EconomicPolicyRegistry.CreateDefaultCatalog();
+        set
+        {
+            _policyRegistry = value;
+            _session.PolicyRegistry = value;
+        }
     }
 
     private void HandleMonthPassed(DateOnly newDate)

@@ -31,6 +31,13 @@ public class CountryState
     public double CorruptionIndex { get; set; } = 25.0; // 0.0 (Clean) to 100.0 (Severe Corruption)
     public double InflationRate { get; set; } = 0.05; // 5.0%
 
+    // Active Economic Policies
+    public List<string> ActivePolicies { get; set; } = new();
+
+    // Fiscal Ledger & Trend History
+    public List<MonthlyBudgetReport> BudgetHistory { get; set; } = new();
+    public MonthlyBudgetReport? LastBudgetReport { get; set; }
+
     // Foreign Relations
     public Dictionary<string, DiplomaticStance> DiplomaticRelations { get; set; } = new();
 
@@ -43,7 +50,48 @@ public class CountryState
         ["Factories"] = 40,
         ["Hospitals"] = 20,
         ["Schools"] = 30,
-        ["Barracks"] = 15
+        ["Barracks"] = 15,
+        ["OilWells"] = 20,
+        ["UraniumMines"] = 5
+    };
+
+    public decimal CalculateMonthlyGdp()
+    {
+        // Base monthly output: $100/person, modified by factories and quality of living
+        decimal baseGdp = (decimal)Population * 100m;
+        int factories = Facilities.GetValueOrDefault("Factories", 10);
+        decimal industrialMultiplier = 1.0m + (factories / 200m);
+        decimal livingMultiplier = 0.8m + ((decimal)QualityOfLiving / 250m);
+        return baseGdp * industrialMultiplier * livingMultiplier;
+    }
+
+    public string CalculateCreditRating()
+    {
+        decimal annualGdp = CalculateMonthlyGdp() * 12m;
+        if (annualGdp <= 0m) return "D";
+
+        double debtToGdp = (double)(Debt / annualGdp);
+
+        if (Treasury < -50_000_000_000m) return "D";
+        if (Treasury < -10_000_000_000m || debtToGdp >= 1.30) return "CCC";
+        if (debtToGdp >= 1.10) return "B";
+        if (debtToGdp >= 0.90) return "BB";
+        if (debtToGdp >= 0.70) return "BBB";
+        if (debtToGdp >= 0.50) return "A";
+        if (debtToGdp >= 0.30) return "AA";
+        return "AAA";
+    }
+
+    public decimal GetMonthlyInterestRate() => CreditRating switch
+    {
+        "AAA" => 0.0050m, // 6.0% annual
+        "AA" => 0.0060m,  // 7.2% annual
+        "A" => 0.0075m,   // 9.0% annual
+        "BBB" => 0.0090m, // 10.8% annual
+        "BB" => 0.0120m,  // 14.4% annual
+        "B" => 0.0150m,   // 18.0% annual
+        "CCC" => 0.0200m, // 24.0% annual
+        _ => 0.0300m      // 36.0% annual for Default / D
     };
 
     public DiplomaticStance GetRelationsWith(string otherCountryId)
