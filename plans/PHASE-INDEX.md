@@ -61,3 +61,12 @@ V1 is a parity-first remake. Complete phases in order unless the human owner app
 - [`09-01`: Feature parity audit and bug bash](sprints/09-01.md)
 - [`09-02`: Windows packaging, clean-machine test and recovery](sprints/09-02.md)
 - [`09-03`: V1 release gate and V2 backlog capture](sprints/09-03.md)
+
+## Phase 10: TypeScript Engine-Free Architecture & Modern Web/Desktop Migration
+
+- [`10-01`: TypeScript simulation core and Vitest parity suite](phases/PHASE-10.md#sprint-10-01-typescript-simulation-core--vitest-parity-suite)
+- [`10-02`: Interactive vector world map and geopolitical HUD](phases/PHASE-10.md#sprint-10-02-interactive-vector-world-map--geopolitical-hud)
+- [`10-03`: Governance, tasks and economy desktop panels (F1–F4)](phases/PHASE-10.md#sprint-10-03-governance-tasks--economy-desktop-panels-f1f4)
+- [`10-04`: Diplomacy, military warfare and achievements (F6–F8)](phases/PHASE-10.md#sprint-10-04-diplomacy-military-warfare--achievements-f6f8)
+- [`10-05`: Persistence, Web Audio, GitHub Pages and standalone packaging](phases/PHASE-10.md#sprint-10-05-persistence-web-audio-github-pages--standalone-desktop-packaging)
+
