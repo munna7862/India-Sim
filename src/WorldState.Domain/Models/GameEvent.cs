@@ -1,3 +1,5 @@
+using WorldState.Domain.Navigation;
+
 namespace WorldState.Domain.Models;
 
 public enum EventCategory
@@ -8,7 +10,9 @@ public enum EventCategory
     Military,
     Diplomacy,
     Emergency,
-    Tasks
+    Tasks,
+    Achievements,
+    World
 }
 
 public enum EventSeverity
@@ -26,5 +30,7 @@ public record GameEvent(
     EventCategory Category = EventCategory.General,
     EventSeverity Severity = EventSeverity.Info,
     string? ActorCountryId = null,
-    string? TargetCountryId = null
+    string? TargetCountryId = null,
+    ScreenRoute? ActionRoute = null,
+    bool IsRead = false
 );

@@ -18,11 +18,20 @@ public class GameSession
     public ActiveEventPrompt? PendingEvent { get; set; }
     public Dictionary<string, int> EventCooldowns { get; set; } = new();
 
+    public Dictionary<string, AchievementProgress> Achievements { get; set; } = new();
+    public List<string> ClaimedAchievementRewardIds { get; set; } = new();
+
     [System.Text.Json.Serialization.JsonIgnore]
     public Economy.EconomicPolicyRegistry? PolicyRegistry { get; set; }
 
     [System.Text.Json.Serialization.JsonIgnore]
     public Military.MilitaryUnitRegistry? MilitaryRegistry { get; set; }
+
+    [System.Text.Json.Serialization.JsonIgnore]
+    public Achievements.AchievementRegistry? AchievementRegistry { get; set; }
+
+    [System.Text.Json.Serialization.JsonIgnore]
+    public Events.WorldEventRegistry? WorldEventRegistry { get; set; }
 
 
     public void AddEvent(GameEvent gameEvent)
@@ -41,6 +50,18 @@ public class GameSession
             PlayerCountryId = protagonistCountryId,
             Tasks = WorldState.Domain.Tasks.TaskRegistry.CreateDefaultModernTasks()
         };
+
+        var achievementCatalog = WorldState.Domain.Achievements.AchievementRegistry.CreateDefaultCatalog();
+        session.AchievementRegistry = achievementCatalog;
+        foreach (var ach in achievementCatalog.Achievements)
+        {
+            session.Achievements[ach.Id] = new AchievementProgress
+            {
+                AchievementId = ach.Id,
+                IsUnlocked = false,
+                ProgressPercent = 0.0
+            };
+        }
 
         var playerCountry = CountryState.CreateIndiaDefault();
         playerCountry.Id = protagonistCountryId;

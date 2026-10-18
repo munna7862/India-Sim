@@ -195,25 +195,40 @@ if (Directory.Exists(tasksDir))
     }
 }
 
-// 5. Validate Domestic Event Definitions
+// 5. Validate Domestic & World Event Definitions
 string eventsDir = Path.Combine(contentDir, "events");
-int validatedEvents = 0;
+int validatedDomesticEvents = 0;
+int validatedWorldEvents = 0;
 if (Directory.Exists(eventsDir))
 {
-    Console.WriteLine("\n--- Validating Domestic Event Definitions ---");
+    Console.WriteLine("\n--- Validating Event Definitions ---");
     string[] eventFiles = Directory.GetFiles(eventsDir, "*.json");
     foreach (string file in eventFiles)
     {
-        Console.WriteLine($"Validating domestic events: {Path.GetFileName(file)}...");
+        string filename = Path.GetFileName(file);
         try
         {
             string json = File.ReadAllText(file);
-            var eventRegistry = new WorldState.Domain.Events.DomesticEventRegistry();
-            eventRegistry.LoadFromJson(json);
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"  [OK] Valid events dataset: {Path.GetFileName(file)} with {eventRegistry.Events.Count} event definitions.");
-            Console.ResetColor();
-            validatedEvents += eventRegistry.Events.Count;
+            if (filename.StartsWith("world", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine($"Validating world events: {filename}...");
+                var worldRegistry = new WorldState.Domain.Events.WorldEventRegistry();
+                worldRegistry.LoadFromJson(json);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"  [OK] Valid world events dataset: {filename} with {worldRegistry.Events.Count} event definitions.");
+                Console.ResetColor();
+                validatedWorldEvents += worldRegistry.Events.Count;
+            }
+            else
+            {
+                Console.WriteLine($"Validating domestic events: {filename}...");
+                var eventRegistry = new WorldState.Domain.Events.DomesticEventRegistry();
+                eventRegistry.LoadFromJson(json);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"  [OK] Valid domestic events dataset: {filename} with {eventRegistry.Events.Count} event definitions.");
+                Console.ResetColor();
+                validatedDomesticEvents += eventRegistry.Events.Count;
+            }
         }
         catch (Exception ex)
         {
@@ -285,6 +300,37 @@ if (Directory.Exists(militaryDir))
     }
 }
 
-Console.WriteLine($"\nValidation Complete: {validatedCountries} countries, {validatedScenarios} scenarios, {validatedMaps} map datasets, {validatedTasks} tasks, {validatedEvents} events, {validatedPolicies} policies, {validatedUnits} military units. Errors: {errorCount}.");
+// 8. Validate Achievement Definitions
+string achievementsDir = Path.Combine(contentDir, "achievements");
+int validatedAchievements = 0;
+if (Directory.Exists(achievementsDir))
+{
+    Console.WriteLine("\n--- Validating Achievement Definitions ---");
+    string[] achievementFiles = Directory.GetFiles(achievementsDir, "*.json");
+    foreach (string file in achievementFiles)
+    {
+        Console.WriteLine($"Validating achievements: {Path.GetFileName(file)}...");
+        try
+        {
+            string json = File.ReadAllText(file);
+            var achievementRegistry = new WorldState.Domain.Achievements.AchievementRegistry();
+            achievementRegistry.LoadFromJson(json);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"  [OK] Valid achievements dataset: {Path.GetFileName(file)} with {achievementRegistry.Achievements.Count} achievement definitions.");
+            Console.ResetColor();
+            validatedAchievements += achievementRegistry.Achievements.Count;
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  [ERROR] Achievement validation failure: {ex.Message}");
+            Console.ResetColor();
+            errorCount++;
+        }
+    }
+}
+
+Console.WriteLine($"\nValidation Complete: {validatedCountries} countries, {validatedScenarios} scenarios, {validatedMaps} map datasets, {validatedTasks} tasks, {validatedDomesticEvents} domestic events, {validatedWorldEvents} world events, {validatedPolicies} policies, {validatedUnits} military units, {validatedAchievements} achievements. Errors: {errorCount}.");
 return errorCount == 0 ? 0 : 1;
+
 

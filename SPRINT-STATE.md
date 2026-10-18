@@ -1,15 +1,15 @@
 # Sprint State
 
 - Project: Rashtra: Sovereign Republic (Desktop Remake)
-- Status: Phase 06 completed; Ready for Phase 07.
-- Active phase: 06 (Diplomacy, Military & International Actions) -> COMPLETED
-- Active sprint: 06-03 (Conflict, espionage and security actions) -> COMPLETED; Next: 07-01 (Achievements and progression)
-- Sprint status: Completed (All 3 Phase 06 sprints completed: Diplomacy and commercial agreements, Military inventory, recruitment and deployment, Conflict, espionage and security actions; 165/165 tests green)
-- Last verified commit: Phase 06 completion
-- Last CI run: Local `.\build.ps1` execution passed (165/165 tests pass, ContentValidator verified 6 countries, 1 scenario, 1 map dataset, 8 tasks, 5 domestic events, 6 economic policies, 12 military units, 0 warnings/errors)
+- Status: Phase 07 completed; Ready for Phase 08.
+- Active phase: 07 (Achievements, Events, Notifications & Progression) -> COMPLETED
+- Active sprint: 07-03 (Cross-system gameplay parity) -> COMPLETED; Next: 08-01 (Save/load robustness, metadata and multiple profiles)
+- Sprint status: Completed (All 3 Phase 07 sprints completed: Achievements and progression, World events, alerts and event history, Cross-system gameplay parity; 182/182 tests green)
+- Last verified commit: Phase 07 completion
+- Last CI run: Local `.\build.ps1` execution passed (182/182 tests pass, ContentValidator verified 6 countries, 1 scenario, 1 map dataset, 8 tasks, 5 domestic events, 6 world events, 6 economic policies, 12 military units, 8 achievements, 0 warnings/errors)
 
 ## Current objective
-Transition to Phase 07 (Achievements, Events, Notifications & Progression) and execute Sprint 07-01 (Achievements and progression).
+Transition to Phase 08 (Save/Load Polish, Settings, Menus & Visual System) and execute Sprint 08-01 (Save/load robustness, metadata and multiple profiles).
 
 ## Blockers / decisions
 - Reference Game Access Limitation: Direct Android APK execution is not supported natively in this Windows agent environment without an emulator. Publicly verified developer documentation, store descriptions, and gameplay captures were synthesized into `REFERENCE-INVENTORY.md` and `FEATURE-PARITY-MATRIX.md`. A companion checklist (`docs/research/REFERENCE-RESEARCH-CHECKLIST.md`) is provided for the human owner to log live-session numerical coefficients.
@@ -30,6 +30,9 @@ Transition to Phase 07 (Achievements, Events, Notifications & Progression) and e
 - Diplomacy & Commercial Agreements (Sprint 06-01): Completed (`Diplomacy.cs`, `SendDiplomaticGiftCommand.cs`, `SignNonAggressionPactCommand.cs`, `SignTradeContractCommand.cs`, `CancelTradeContractCommand.cs`, monthly trade flow, `DiplomacyViewModel.cs`).
 - Military Inventory & Recruitment (Sprint 06-02): Completed (`content/military/military_units.json` 12 units, `MilitaryUnitRegistry.cs`, `RecruitMilitaryUnitsCommand.cs`, `DisbandMilitaryUnitsCommand.cs`, monthly military upkeep, `MilitaryViewModel.cs`).
 - Conflict & Security Actions (Sprint 06-03): Completed (`DeclareWarCommand.cs`, `ResolveCombatCommand.cs` with drill bonus & homeland defense, `SignPeaceTreatyCommand.cs`, `FundPresidentialProtectionCommand.cs`, `LaunchCounterTerrorismCommand.cs`, `DispatchCovertOperationCommand.cs`, `DiplomacyMilitaryTests.cs` with 165/165 passing tests).
+- Achievements and Progression (Sprint 07-01): Completed (`content/achievements/achievements.json` 8 achievements, `AchievementRegistry.cs`, `ClaimAchievementRewardCommand.cs`, `AchievementsViewModel.cs`, `GameShell.cs` / `GameShell.tscn` `AchievementsPanel`, F10 shortcut, `AchievementsProgressionTests.cs`).
+- World Events & Newsfeed History (Sprint 07-02): Completed (`content/events/world_events.json` 6 world events, `WorldEventRegistry.cs`, `WorldEventDefinition.cs`, `DismissNotificationCommand.cs`, `EventHistoryViewModel.cs`, `GameShell.cs` / `GameShell.tscn` `EventsPanel`, F8 shortcut, unread badge counter, `WorldEventsAndNotificationsTests.cs`).
+- Cross-System Gameplay Parity (Sprint 07-03): Completed (`CrossSystemGameplayParityTests.cs` testing end-to-end loops across all systems, mid-simulation timed operations, emergency prompts, foreign treaties, and save/load persistence; 182/182 tests green).
 - Map Data Licensing (ADR-002): Natural Earth Admin 0 Public Domain vector datasets integrated under `GEO-01`.
 - Branding & Clean-Room Policy: Resolved in Sprint 00-02 via `docs/legal/CLEAN-ROOM-POLICY.md` (Working title: "Rashtra: Sovereign Republic").
 
@@ -57,10 +60,10 @@ Transition to Phase 07 (Achievements, Events, Notifications & Progression) and e
 | 06-01 | Completed | `Diplomacy.cs`, `SendDiplomaticGiftCommand.cs`, `SignNonAggressionPactCommand.cs`, `SignTradeContractCommand.cs`, `CancelTradeContractCommand.cs`, `DiplomacyViewModel.cs` |
 | 06-02 | Completed | `content/military/military_units.json`, `MilitaryUnitRegistry.cs`, `RecruitMilitaryUnitsCommand.cs`, `DisbandMilitaryUnitsCommand.cs`, `MilitaryViewModel.cs` |
 | 06-03 | Completed | `DeclareWarCommand.cs`, `ResolveCombatCommand.cs`, `SignPeaceTreatyCommand.cs`, `FundPresidentialProtectionCommand.cs`, `LaunchCounterTerrorismCommand.cs`, `DispatchCovertOperationCommand.cs`, `DiplomacyMilitaryTests.cs` (165/165 tests pass) |
-| 07-01 | Ready / Next | `plans/sprints/07-01.md` |
-| 07-02 | Not started | None |
-| 07-03 | Not started | None |
-| 08-01 | Not started | None |
+| 07-01 | Completed | `content/achievements/achievements.json`, `AchievementRegistry.cs`, `ClaimAchievementRewardCommand.cs`, `AchievementsViewModel.cs`, `AchievementsPanel`, `AchievementsProgressionTests.cs` |
+| 07-02 | Completed | `content/events/world_events.json`, `WorldEventRegistry.cs`, `DismissNotificationCommand.cs`, `EventHistoryViewModel.cs`, `EventsPanel`, `WorldEventsAndNotificationsTests.cs` |
+| 07-03 | Completed | `CrossSystemGameplayParityTests.cs` (182/182 tests pass, `build.ps1` green) |
+| 08-01 | Ready / Next | `plans/sprints/08-01.md` |
 | 08-02 | Not started | None |
 | 08-03 | Not started | None |
 | 09-01 | Not started | None |
