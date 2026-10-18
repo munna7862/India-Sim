@@ -1,0 +1,18 @@
+{
+  "id": "IND",
+  "name": "Republic of India",
+  "startingTreasury": 50000000000.0,
+  "startingPopulation": 1400000000,
+  "startingApproval": 65.0,
+  "startingQualityOfLiving": 55.0,
+  "startingStability": 70.0,
+  "incomeTaxRate": 0.20,
+  "corporateTaxRate": 0.25,
+  "vatRate": 0.15,
+  "facilities": {
+    "Farms": 50,
+    "Mines": 25,
+    "PowerPlants": 30,
+    "Factories": 40
+  }
+}

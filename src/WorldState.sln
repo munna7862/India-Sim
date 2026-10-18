@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldState.Domain", "WorldS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldState.Domain.Tests", "WorldState.Domain.Tests\WorldState.Domain.Tests.csproj", "{58AB1CBE-FC25-4B63-8CF7-6CA8956ABF2A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentValidator", "..\tools\ContentValidator\ContentValidator.csproj", "{F10A0AE8-07A3-4B97-BC5C-F1DC2188EC9E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{58AB1CBE-FC25-4B63-8CF7-6CA8956ABF2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58AB1CBE-FC25-4B63-8CF7-6CA8956ABF2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58AB1CBE-FC25-4B63-8CF7-6CA8956ABF2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F10A0AE8-07A3-4B97-BC5C-F1DC2188EC9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F10A0AE8-07A3-4B97-BC5C-F1DC2188EC9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F10A0AE8-07A3-4B97-BC5C-F1DC2188EC9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F10A0AE8-07A3-4B97-BC5C-F1DC2188EC9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
