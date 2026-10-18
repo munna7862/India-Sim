@@ -1,0 +1,45 @@
+name: Build Desktop Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-desktop:
+    name: Build Standalone Windows Executable
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Node Dependencies
+        run: npm install
+
+      - name: Package Desktop Release
+        run: npm run package:desktop
+
+      - name: Create ZIP Archive
+        run: |
+          Compress-Archive -Path "release\Rashtra-Desktop-x64\*" -DestinationPath "Rashtra-Desktop-Windows-x64.zip"
+
+      - name: Upload Desktop Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rashtra-Desktop-Windows-x64
+          path: Rashtra-Desktop-Windows-x64.zip

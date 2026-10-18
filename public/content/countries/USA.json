@@ -1,0 +1,20 @@
+{
+  "id": "USA",
+  "name": "United States of America",
+  "capital": "Washington, D.C.",
+  "isPlayable": true,
+  "startingTreasury": 120000000000.0,
+  "startingPopulation": 335000000,
+  "startingApproval": 52.0,
+  "startingQualityOfLiving": 82.0,
+  "startingStability": 75.0,
+  "incomeTaxRate": 0.22,
+  "corporateTaxRate": 0.21,
+  "vatRate": 0.08,
+  "facilities": {
+    "Farms": 60,
+    "Mines": 40,
+    "PowerPlants": 70,
+    "Factories": 65
+  }
+}

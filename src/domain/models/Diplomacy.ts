@@ -38,6 +38,10 @@ export class DiplomaticStance {
     this.activeTradeContracts = activeTradeContracts;
   }
 
+  get hasNonAggressionPact(): boolean {
+    return this.nonAggressionPactUntil !== null;
+  }
+
   hasActiveNonAggressionPact(currentDate: DateOnly): boolean {
     return this.nonAggressionPactUntil !== null && this.nonAggressionPactUntil.isSameOrAfter(currentDate);
   }

@@ -1,17 +1,12 @@
 import { GameSession } from '../models/GameSession';
 import { CommandResult, ICommand } from './CommandResult';
-import { EventCategory, EventSeverity } from '../models/types';
+import { EventCategory, EventSeverity, TaxType } from '../models/types';
 import { TimedOperation } from '../models/TimedOperation';
 import { EconomicPolicyRegistry } from '../economy/EconomicPolicy';
 import { Ideology } from '../models/Ideology';
 import { TradeContract } from '../models/Diplomacy';
 import { MonthlyBudgetReport } from '../models/MonthlyBudgetReport';
-
-export enum TaxType {
-  IncomeTax = 'IncomeTax',
-  CorporateTax = 'CorporateTax',
-  Vat = 'Vat'
-}
+export { TaxType };
 
 export class AdjustTaxRateCommand implements ICommand {
   countryId: string;
@@ -466,7 +461,7 @@ export class ExecuteMonthlyLedgerCommand implements ICommand {
     let tradeImportExpenses = 0;
     const tradeResourceNetDelta: Record<string, number> = {};
 
-    for (const [partnerId, stance] of Object.entries(country.diplomaticRelations)) {
+    for (const [, stance] of Object.entries(country.diplomaticRelations)) {
       if (stance.nonAggressionPactUntil && stance.nonAggressionPactUntil.isSameOrBefore(session.clock.currentDate)) {
         stance.nonAggressionPactUntil = null;
       }

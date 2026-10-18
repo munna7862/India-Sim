@@ -7,6 +7,10 @@ export class AchievementRegistry {
     return Array.from(this._achievements.values());
   }
 
+  getAll(): AchievementDefinition[] {
+    return this.achievements;
+  }
+
   register(definition: AchievementDefinition): void {
     if (!definition || !definition.id) {
       throw new Error('Achievement Id cannot be null or whitespace.');

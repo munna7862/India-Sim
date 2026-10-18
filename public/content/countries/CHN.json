@@ -1,0 +1,20 @@
+{
+  "id": "CHN",
+  "name": "People's Republic of China",
+  "capital": "Beijing",
+  "isPlayable": true,
+  "startingTreasury": 95000000000.0,
+  "startingPopulation": 1410000000,
+  "startingApproval": 78.0,
+  "startingQualityOfLiving": 68.0,
+  "startingStability": 85.0,
+  "incomeTaxRate": 0.20,
+  "corporateTaxRate": 0.25,
+  "vatRate": 0.13,
+  "facilities": {
+    "Farms": 75,
+    "Mines": 55,
+    "PowerPlants": 80,
+    "Factories": 90
+  }
+}

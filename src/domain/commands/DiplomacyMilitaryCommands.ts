@@ -1,6 +1,7 @@
 import { GameSession } from '../models/GameSession';
 import { CommandResult, ICommand } from './CommandResult';
-import { EventCategory, EventSeverity } from '../models/types';
+import { EventCategory, EventSeverity, CovertOperationType } from '../models/types';
+export { CovertOperationType };
 import { DiplomaticGiftTier, TradeContract } from '../models/Diplomacy';
 import { TimedOperation } from '../models/TimedOperation';
 import { MilitaryUnitRegistry } from '../military/MilitaryUnitDefinition';
@@ -852,11 +853,7 @@ export class SignPeaceTreatyCommand implements ICommand {
   }
 }
 
-export enum CovertOperationType {
-  GatherIntelligence = 'GatherIntelligence',
-  SabotageInfrastructure = 'SabotageInfrastructure',
-  EmbezzleFunds = 'EmbezzleFunds'
-}
+
 
 export class DispatchCovertOperationCommand implements ICommand {
   static readonly OperationCost = 150_000_000;

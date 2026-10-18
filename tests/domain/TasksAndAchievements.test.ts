@@ -13,9 +13,6 @@ import { GameTask, TaskCategory } from '../../src/domain/tasks/GameTask';
 import { AchievementRegistry } from '../../src/domain/achievements/AchievementRegistry';
 import {
   AdjustTaxRateCommand,
-  ConstructFacilityCommand,
-  TakeLoanCommand,
-  RepayLoanCommand,
 } from '../../src/domain/commands/EconomyCommands';
 import { AdjustMinistryFundingCommand } from '../../src/domain/commands/GovernmentCommands';
 import {
@@ -75,7 +72,7 @@ describe('Tasks and Achievements System', () => {
     const startingApproval = country.approvalRating;
     const startingStability = country.stability;
 
-    const task: GameTask = {
+    const task: GameTask = Object.assign(new GameTask(), {
       id: 'TSK_INFRA_01',
       title: 'Modernize National Energy Grid',
       category: TaskCategory.Economic,
@@ -89,7 +86,7 @@ describe('Tasks and Achievements System', () => {
         stabilityBonus: 3.0,
       },
       isRewardClaimed: false,
-    };
+    });
 
     session.tasks[task.id] = task;
 
@@ -121,7 +118,7 @@ describe('Tasks and Achievements System', () => {
     const country = session.getPlayerCountry()!;
     const startingTreasury = country.treasury;
 
-    const task: GameTask = {
+    const task: GameTask = Object.assign(new GameTask(), {
       id: 'TSK_WELFARE_01',
       title: 'Expand Healthcare Network',
       category: TaskCategory.Welfare,
@@ -131,9 +128,11 @@ describe('Tasks and Achievements System', () => {
       ],
       reward: {
         treasuryBonus: 1_000_000_000,
+        approvalBonus: 2.0,
+        stabilityBonus: 2.0,
       },
       isRewardClaimed: false,
-    };
+    });
 
     session.tasks[task.id] = task;
 

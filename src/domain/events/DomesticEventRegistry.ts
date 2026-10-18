@@ -1,4 +1,4 @@
-import { DomesticEventDefinition, EventChoice } from './DomesticEvent';
+import { DomesticEventDefinition } from './DomesticEvent';
 
 export class DomesticEventRegistry {
   private _events: Map<string, DomesticEventDefinition> = new Map();

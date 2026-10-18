@@ -1,4 +1,4 @@
-import { GameTask, TaskCategory, SubTaskState, TaskReward } from './GameTask';
+import { GameTask, TaskCategory, SubTaskState } from './GameTask';
 import { GameTaskStatus } from '../models/types';
 
 export interface SubTaskDefinition {

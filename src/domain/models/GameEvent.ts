@@ -12,4 +12,5 @@ export interface GameEvent {
   targetCountryId?: string | null;
   actionRoute?: string | null;
   isRead?: boolean;
+  isDismissed?: boolean;
 }

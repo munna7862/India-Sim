@@ -3,7 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { GameSession } from '../../src/domain/models/GameSession';
-import { SaveManager, FileSaveStorage, MemorySaveStorage } from '../../src/domain/services/SaveManager';
+import { SaveManager } from '../../src/domain/services/SaveManager';
+import { FileSaveStorage } from '../../src/domain/services/FileSaveStorage';
 import { SaveErrorCode } from '../../src/domain/services/SaveModels';
 import { DateOnly } from '../../src/domain/models/DateOnly';
 import { ClockSpeed, EventCategory, EventSeverity, GameTaskStatus } from '../../src/domain/models/types';
@@ -60,7 +61,7 @@ describe('SaveManager Persistence & Integrity', () => {
       actorCountryId: 'IND',
     });
 
-    const task: GameTask = {
+    const task: GameTask = Object.assign(new GameTask(), {
       id: 'TSK_INFRA_SAVE_TEST',
       title: 'Save Test Task',
       category: TaskCategory.Economic,
@@ -70,7 +71,7 @@ describe('SaveManager Persistence & Integrity', () => {
         { id: 'ST_POWER', description: 'Build Power Plants', targetCount: 30, currentCount: 38 },
       ],
       reward: { treasuryBonus: 0, approvalBonus: 0, stabilityBonus: 0 },
-    };
+    });
     session.tasks[task.id] = task;
     session.claimedRewardIds.push(task.id);
 

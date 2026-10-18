@@ -15,11 +15,20 @@ export interface TaskReward {
   achievementId?: string | null;
 }
 
-export class SubTaskState {
+export interface ISubTaskState {
   id: string;
   description: string;
   currentCount: number;
   targetCount: number;
+  isCompleted?: boolean;
+}
+
+export class SubTaskState implements ISubTaskState {
+  id: string;
+  description: string;
+  currentCount: number;
+  targetCount: number;
+  private _isCompleted?: boolean;
 
   constructor(id: string = '', description: string = '', targetCount: number = 0, currentCount: number = 0) {
     this.id = id;
@@ -29,11 +38,31 @@ export class SubTaskState {
   }
 
   get isCompleted(): boolean {
+    if (this._isCompleted !== undefined) return this._isCompleted;
     return this.currentCount >= this.targetCount;
+  }
+  set isCompleted(val: boolean) {
+    this._isCompleted = val;
   }
 }
 
-export class GameTask {
+export interface IGameTask {
+  id: string;
+  title: string;
+  description?: string;
+  category: TaskCategory;
+  isPrincipal?: boolean;
+  prerequisiteTaskId?: string | null;
+  deadline?: DateOnly | null;
+  status: GameTaskStatus;
+  subTasks: (SubTaskState | ISubTaskState)[];
+  reward: TaskReward;
+  isRewardClaimed: boolean;
+  progressPercentage?: number;
+  checkCompletion?: () => boolean;
+}
+
+export class GameTask implements IGameTask {
   id: string = '';
   title: string = '';
   description: string = '';
@@ -42,7 +71,7 @@ export class GameTask {
   prerequisiteTaskId?: string | null = null;
   deadline?: DateOnly | null = null;
   status: GameTaskStatus = GameTaskStatus.Active;
-  subTasks: SubTaskState[] = [];
+  subTasks: (SubTaskState | ISubTaskState)[] = [];
   reward: TaskReward = { treasuryBonus: 0, approvalBonus: 0, stabilityBonus: 0 };
   isRewardClaimed: boolean = false;
 
@@ -66,7 +95,7 @@ export class GameTask {
       return true;
     }
 
-    if (this.subTasks.length > 0 && this.subTasks.every((st) => st.isCompleted)) {
+    if (this.subTasks.length > 0 && this.subTasks.every((st) => Boolean(st.isCompleted) || (st.currentCount >= st.targetCount))) {
       this.status = GameTaskStatus.Completed;
       return true;
     }

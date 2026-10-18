@@ -4,7 +4,7 @@ import { GameEvent } from './GameEvent';
 import { TimedOperation } from './TimedOperation';
 import { CooldownTracker } from './Cooldowns';
 import { ActiveEventPrompt } from '../events/DomesticEvent';
-import { GameTask } from '../tasks/GameTask';
+import { GameTask, IGameTask } from '../tasks/GameTask';
 import { TaskRegistry } from '../tasks/TaskRegistry';
 import { AchievementProgress } from '../achievements/Achievement';
 import { AchievementRegistry } from '../achievements/AchievementRegistry';
@@ -23,7 +23,7 @@ export class GameSession {
   clock: SimulationClock = new SimulationClock();
   countries: Record<string, CountryState> = {};
   events: GameEvent[] = [];
-  tasks: Record<string, GameTask> = {};
+  tasks: Record<string, GameTask | IGameTask> = {};
   claimedRewardIds: string[] = [];
   timedOperations: TimedOperation[] = [];
   cooldowns: CooldownTracker = new CooldownTracker();
@@ -32,6 +32,23 @@ export class GameSession {
 
   achievements: Record<string, AchievementProgress> = {};
   claimedAchievementRewardIds: string[] = [];
+  activeDomesticEvents: any[] = [];
+
+  get tradeContracts(): any[] {
+    const list: any[] = [];
+    const seen = new Set<string>();
+    for (const c of Object.values(this.countries)) {
+      for (const stance of Object.values(c.diplomaticRelations)) {
+        for (const tc of stance.activeTradeContracts || []) {
+          if (!seen.has(tc.id)) {
+            seen.add(tc.id);
+            list.push(tc);
+          }
+        }
+      }
+    }
+    return list;
+  }
 
   policyRegistry?: EconomicPolicyRegistry;
   militaryRegistry?: MilitaryUnitRegistry;
@@ -46,6 +63,10 @@ export class GameSession {
 
   getPlayerCountry(): CountryState | null {
     return this.countries[this.playerCountryId] ?? null;
+  }
+
+  static createInitialSession(protagonistCountryId: string = 'IND'): GameSession {
+    return GameSession.createNewGame(protagonistCountryId);
   }
 
   static createNewGame(protagonistCountryId: string = 'IND'): GameSession {

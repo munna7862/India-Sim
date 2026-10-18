@@ -3,7 +3,6 @@ import { GameSession } from '../../src/domain/models/GameSession';
 import { SimulationEngine } from '../../src/domain/services/SimulationEngine';
 import { SaveManager, MemorySaveStorage } from '../../src/domain/services/SaveManager';
 import { TaxType, GameTaskStatus } from '../../src/domain/models/types';
-import { DateOnly } from '../../src/domain/models/DateOnly';
 import {
   AdjustTaxRateCommand,
   EnactEconomicPolicyCommand,

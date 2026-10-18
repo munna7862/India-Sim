@@ -1,10 +1,5 @@
-export enum IdeologyType {
-  ConstitutionalDemocracy = 'ConstitutionalDemocracy',
-  DemocraticSocialism = 'DemocraticSocialism',
-  AuthoritarianRepublic = 'AuthoritarianRepublic',
-  NationalistFederation = 'NationalistFederation',
-  Technocracy = 'Technocracy'
-}
+import { IdeologyType } from './types';
+export { IdeologyType };
 
 export interface IdeologyDefinition {
   type: IdeologyType;

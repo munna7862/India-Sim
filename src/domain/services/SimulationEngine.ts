@@ -12,12 +12,17 @@ import { WorldEventRegistry } from '../events/WorldEventRegistry';
 import { ExecuteMonthlyLedgerCommand } from '../commands/EconomyCommands';
 import { ActiveEventPrompt } from '../events/DomesticEvent';
 import { AchievementProgress } from '../achievements/Achievement';
+import { MinistryState } from '../models/MinistryState';
 
 export class SimulationEngine {
   private _session: GameSession;
 
   get session(): GameSession {
     return this._session;
+  }
+  set session(s: GameSession) {
+    this._session = s;
+    this.wireClockEvents();
   }
 
   onCommandExecuted?: (command: ICommand, result: CommandResult) => void;
@@ -39,8 +44,14 @@ export class SimulationEngine {
     this._session.clock.onMonthPassed = (m) => this.handleMonthPassed(m);
   }
 
-  tick(deltaSeconds: number): void {
+  tick(deltaSeconds: number): { dateChanged: boolean; monthRolledOver: boolean } {
+    const prevDate = this._session.clock.currentDate;
+    const prevMonth = prevDate.month;
     this._session.clock.tick(deltaSeconds);
+    const newDate = this._session.clock.currentDate;
+    const dateChanged = !newDate.equals(prevDate);
+    const monthRolledOver = newDate.month !== prevMonth;
+    return { dateChanged, monthRolledOver };
   }
 
   dispatch(command: ICommand): CommandResult {
@@ -139,12 +150,12 @@ export class SimulationEngine {
     }
     const competence = ministry.activeMinister?.competence ?? 0.70;
     let fundingMult = 1.0;
-    const f = ministry.funding ?? (ministry as any).fundingLevel;
-    if (f === FundingLevel.Zero || f === 0) fundingMult = 0.0;
-    else if (f === FundingLevel.Low || f === 25 || f === 1) fundingMult = 0.70;
-    else if (f === FundingLevel.Medium || f === 50 || f === 2) fundingMult = 1.0;
-    else if (f === FundingLevel.High || f === 75 || f === 3) fundingMult = 1.20;
-    else if (f === FundingLevel.Maximum || f === 100 || f === 4) fundingMult = 1.35;
+    const f = Number(ministry.funding ?? (ministry as any).fundingLevel ?? 50);
+    if (f === 0) fundingMult = 0.0;
+    else if (f === 25 || f === 1) fundingMult = 0.70;
+    else if (f === 50 || f === 2) fundingMult = 1.0;
+    else if (f === 75 || f === 3) fundingMult = 1.20;
+    else if (f === 100 || f === 4) fundingMult = 1.35;
     return Math.min(1.0, competence * fundingMult);
   }
 
@@ -319,7 +330,7 @@ export class SimulationEngine {
 
       const isComplete = typeof task.checkCompletion === 'function'
         ? task.checkCompletion()
-        : (task.status === GameTaskStatus.Completed || (task.subTasks && task.subTasks.length > 0 && task.subTasks.every((st: any) => st.currentCount >= st.targetCount)));
+        : Boolean(task.subTasks && task.subTasks.length > 0 && task.subTasks.every((st: any) => st.currentCount >= st.targetCount));
 
       if (isComplete && stateChanged) {
         this._session.addEvent({

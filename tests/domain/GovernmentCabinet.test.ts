@@ -8,7 +8,6 @@ import { MinisterRosterService } from '../../src/domain/services/MinisterRosterS
 import {
   AppointMinisterCommand,
   DismissMinisterCommand,
-  SetMinistryFundingCommand,
   ChangeIdeologyCommand,
 } from '../../src/domain/commands/GovernmentCommands';
 

@@ -1,32 +1,12 @@
-export enum MinistryType {
-  Health = 'Health',
-  Education = 'Education',
-  Infrastructure = 'Infrastructure',
-  Culture = 'Culture',
-  Sports = 'Sports',
-  Tourism = 'Tourism',
-  Justice = 'Justice',
-  InternalAffairs = 'InternalAffairs',
-  Defense = 'Defense',
-  SecurityIntelligence = 'SecurityIntelligence',
-  Finance = 'Finance',
-  IndustryConstruction = 'IndustryConstruction',
-  Environment = 'Environment'
-}
-
-export enum FundingLevel {
-  Zero = 0,
-  Low = 25,
-  Medium = 50,
-  High = 75,
-  Maximum = 100
-}
+import { MinistryType, FundingLevel } from './types';
+export { MinistryType, FundingLevel };
 
 export interface Minister {
   id: string;
   name: string;
   competence: number; // 0.0 to 1.0 multiplier
   monthlySalary: number;
+  salary?: number;
 }
 
 export class MinistryState {

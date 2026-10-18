@@ -42,7 +42,9 @@ desktop.ini
 # --- Web / Node / TypeScript Artifacts ---
 node_modules/
 dist/
+dist-web/
 dist-desktop/
+release/
 coverage/
 .vite/
 *.tsbuildinfo

@@ -7,11 +7,23 @@ import { MonthlyBudgetReport } from './MonthlyBudgetReport';
 export class CountryState {
   id: string = '';
   name: string = '';
+  isPlayerControlled: boolean = false;
+  timedOperations: any[] = [];
   treasury: number = 0;
   population: number = 0;
   approvalRating: number = 60.0; // 0.0 to 100.0
   qualityOfLiving: number = 60.0; // 0.0 to 100.0
   stability: number = 60.0; // 0.0 to 100.0
+
+  get gdp(): number {
+    return this.calculateMonthlyGdp() * 12;
+  }
+
+  constructor(id: string = '', name: string = '', isPlayerControlled: boolean = false) {
+    this.id = id;
+    this.name = name;
+    this.isPlayerControlled = isPlayerControlled;
+  }
 
   // Tax Sliders (0.0 to 1.0)
   incomeTaxRate: number = 0.20;

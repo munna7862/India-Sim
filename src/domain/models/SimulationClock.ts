@@ -5,6 +5,18 @@ export class SimulationClock {
   currentDate: DateOnly;
   speed: ClockSpeed;
   accumulatorSeconds: number;
+  totalDaysSimulated: number = 0;
+  private _isPaused: boolean = false;
+
+  get isPaused(): boolean {
+    return this._isPaused || this.speed === ClockSpeed.Paused;
+  }
+  set isPaused(val: boolean) {
+    this._isPaused = val;
+    if (val && this.speed !== ClockSpeed.Paused) {
+      // keep speed preference
+    }
+  }
 
   onDayPassed?: (date: DateOnly) => void;
   onMonthPassed?: (date: DateOnly) => void;
@@ -55,6 +67,7 @@ export class SimulationClock {
   advanceDay(): void {
     const previousMonth = this.currentDate.month;
     this.currentDate = this.currentDate.addDays(1);
+    this.totalDaysSimulated++;
     this.onDayPassed?.(this.currentDate);
 
     if (this.currentDate.month !== previousMonth) {

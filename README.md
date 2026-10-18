@@ -1,20 +1,26 @@
-# Rashtra: Sovereign Republic (Desktop Remake)
+# Rashtra: Sovereign Republic (Engine-Free Modern Remake)
 
-A Windows desktop, clean-room re-implementation of the geopolitical presidential strategy gameplay of *India Simulator 2 Premium*, featuring original graphics, a desktop-friendly UI, and pure .NET domain rules.
+A modern, engine-free, clean-room re-implementation of the geopolitical presidential strategy gameplay of *India Simulator 2 Premium*, featuring high-density vector cartography, rich dark-mode UI, procedural Web Audio, and pure domain rules.
 
 ---
 
-## 🎮 Quick Start: How to Play (Standalone Windows)
+## 🌐 Instant Play in Browser (Zero Download & Zero Install)
 
-**No game engines, SDKs, or installations required!**
+Play immediately in any desktop or mobile browser via GitHub Pages:
+👉 **[Launch Rashtra Online](https://munna7862.github.io/India-Sim/)**
 
-1. **Download:** Go to [GitHub Releases (v1.0.0)](https://github.com/munna7862/India-Sim/releases/tag/v1.0.0) and download **`Rashtra-v1.0.0-win-x64.zip`**.
-2. **Extract:** Right-click the `.zip` file and select **Extract All...** (to any folder on your PC).
-3. **Launch:** Open the extracted folder and double-click **`Rashtra.exe`** (or **`Play-Rashtra.bat`**).
-4. **Controls:**
-   - **Panels:** `F1` (Cabinet), `F2` (Tasks), `F3` (Events), `F4` (Economy), `F5` (QuickSave), `F6` (Diplomacy), `F7` (Military), `F8` (Achievements), `F9` (QuickLoad), `F10` (Settings).
-   - **Simulation Speed:** `Space` (Pause/Resume), `1` (1x), `2` (2x), `3` (3x).
-   - **World Map:** Left-click + drag to pan, mouse scroll to zoom.
+---
+
+## 🎮 Standalone Windows Desktop App (< 10 MB)
+
+**No game engines, Godot, or command prompt needed!**
+
+1. Run **`Launch-Desktop.bat`** (or compile via `npm run package:desktop`).
+2. Double-click **`release\Rashtra-Desktop-x64\Rashtra.exe`** (just 0.86 MB, uses native Windows Edge WebView2 runtime).
+3. **Controls:**
+   - **Panels:** `F1` (Cabinet), `F2` (Tasks), `F3` (Events), `F4` (Economy), `F5` (QuickSave), `F6` (Diplomacy), `F7` (Military), `F8` (Achievements), `F9` (QuickLoad), `Esc` (Close Panel).
+   - **Simulation Speed:** `Space` (Pause/Resume), `1` (1x Normal), `2` (2x Fast), `3` (3x Ultra).
+   - **World Map:** Left-click + drag to pan, mouse scroll to zoom in/out, click country for dossier.
 
 ---
 
@@ -37,44 +43,52 @@ A Windows desktop, clean-room re-implementation of the geopolitical presidential
 
 ```text
 src/
-├── WorldState.Domain/       # Pure .NET 8 LTS: authoritative rules, clock, command pipeline
-├── WorldState.Domain.Tests/ # xUnit test suite (218 tests: unit, integration, benchmarks)
-└── WorldState.Desktop/      # Godot 4 .NET client: UI, map presentation, input, audio
+├── domain/                  # Pure TypeScript domain engine: rules, clock, command pipeline
+│   ├── clock/               # Deterministic 1-day/30-day cadence SimulationClock
+│   ├── commands/            # 25+ domain commands (Budget, Facilities, Ministers, War, Trade)
+│   ├── models/              # GameState, Country, Minister, DiplomaticStance, ResourceLedger
+│   └── services/            # SaveManager, LocalStorage/Memory/File storage providers
+├── ui/                      # Modern React 18 + Vanilla CSS desktop interface
+│   ├── components/          # TopHUD, WorldMap (D3 SVG), BottomNavBar, DomesticEventModal
+│   ├── panels/              # EconomyPanel (F4), GovernmentPanel (F1), DiplomacyPanel (F6)...
+│   └── services/            # Procedural Web Audio API sound synthesizer
+tests/                       # 67 Vitest tests validating domain engine mathematical parity
+desktop/                     # Standalone Windows WebView2 runner (0.86 MB Rashtra.exe)
 content/                     # Validated JSON data definitions (countries, tasks, events, units)
-tools/ContentValidator/      # Headless schema and data validator CLI
-dist/                        # Packaged Windows desktop standalone distributions (.zip & SHA256)
 ```
 
 ---
 
-## Clean-Checkout Build & Test (Windows)
+## Development & Build Commands
 
-### Prerequisites
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (LTS)
-- Windows 10/11 (x64)
-- (Optional for client) [Godot 4.3 .NET](https://godotengine.org/download/windows/)
-
-### Build & Run Tests (One Command)
-Run the automated build script from the repository root:
+### Engine-Free Web & Desktop App (TypeScript / React)
 ```powershell
-.\build.ps1
+# Install Node dependencies
+npm install
+
+# Run Vitest automated test suite (67 tests, 100% domain parity)
+npm test
+
+# Launch local development server (http://localhost:3000)
+npm run dev
+
+# Build production web bundle (dist-web/)
+npm run build
+
+# Package standalone Windows desktop release (release/Rashtra-Desktop-x64/Rashtra.exe)
+npm run package:desktop
 ```
 
-### Windows Desktop Packaging
-To create a standalone redistributable package with versioning, SHA256 checksums, and documentation:
+### Pure .NET Domain & CLI Validation
 ```powershell
-.\package.ps1 -Configuration Release -Version 1.0.0
-```
-
-### Direct .NET CLI Execution
-```powershell
-# Restore & build solution in Release configuration
+# Restore & build .NET solution
 dotnet restore src/WorldState.sln
 dotnet build src/WorldState.sln -c Release /p:TreatWarningsAsErrors=true
 
-# Run domain unit & round-trip tests
+# Run .NET domain xUnit tests (218 tests)
 dotnet test src/WorldState.sln -c Release --no-build
 
 # Validate game content schemas
 dotnet run --project tools/ContentValidator/ContentValidator.csproj -c Release --no-build
 ```
+

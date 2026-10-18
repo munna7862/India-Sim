@@ -14,7 +14,7 @@ export class WorldEventDefinition {
   relationsImpact: number = 0;
   actionRoute?: string | null = null;
 
-  applyEffects(session: any, playerCountry: CountryState): void {
+  applyEffects(_session: any, playerCountry: CountryState): void {
     if (!playerCountry) return;
 
     if (this.treasuryImpact !== 0) {

@@ -58,7 +58,14 @@ export enum EventCategory {
 export enum EventSeverity {
   Info = 'Info',
   Warning = 'Warning',
-  Critical = 'Critical'
+  Critical = 'Critical',
+  Emergency = 'Emergency'
+}
+
+export enum CovertOperationType {
+  GatherIntelligence = 'GatherIntelligence',
+  SabotageInfrastructure = 'SabotageInfrastructure',
+  EmbezzleFunds = 'EmbezzleFunds'
 }
 
 export enum GameTaskStatus {

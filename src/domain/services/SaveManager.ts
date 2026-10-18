@@ -1,8 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { GameSession } from '../models/GameSession';
 import { DateOnly } from '../models/DateOnly';
-import { SimulationClock } from '../models/SimulationClock';
 import { CountryState } from '../models/CountryState';
 import { DiplomaticStance } from '../models/Diplomacy';
 import { CooldownTracker } from '../models/Cooldowns';
@@ -95,161 +92,25 @@ export class LocalStorageSaveStorage implements ISaveStorage {
   }
 }
 
-export class FileSaveStorage implements ISaveStorage {
-  private baseDir: string;
-
-  constructor(baseDir: string) {
-    this.baseDir = baseDir;
-    try {
-      if (!fs.existsSync(this.baseDir)) {
-        fs.mkdirSync(this.baseDir, { recursive: true });
-      }
-    } catch {
-      // ignore
-    }
-  }
-
-  private getPath(key: string): string {
-    return path.join(this.baseDir, `${key}.json`);
-  }
-
-  getItem(key: string): string | null {
-    const p = this.getPath(key);
-    try {
-      if (fs.existsSync(p)) {
-        return fs.readFileSync(p, 'utf-8');
-      }
-    } catch {
-      // ignore
-    }
-    return null;
-  }
-
-  setItem(key: string, value: string): void {
-    const target = this.getPath(key);
-    const temp = path.join(this.baseDir, `${key}.json.tmp`);
-    const bak = path.join(this.baseDir, `${key}.json.bak`);
-
-    // 1. Write to temp file
-    fs.writeFileSync(temp, value, 'utf-8');
-
-    // 2. Backup if target exists
-    if (fs.existsSync(target)) {
-      try {
-        fs.copyFileSync(target, bak);
-      } catch {
-        // ignore
-      }
-    }
-
-    // 3. Atomically rename/replace
-    try {
-      if (fs.existsSync(target)) {
-        fs.unlinkSync(target);
-      }
-      fs.renameSync(temp, target);
-    } catch {
-      fs.writeFileSync(target, value, 'utf-8');
-      try {
-        if (fs.existsSync(temp)) fs.unlinkSync(temp);
-      } catch {
-        // ignore
-      }
-    }
-  }
-
-  removeItem(key: string): void {
-    const target = this.getPath(key);
-    const bak = path.join(this.baseDir, `${key}.json.bak`);
-    try {
-      if (fs.existsSync(target)) fs.unlinkSync(target);
-      if (fs.existsSync(bak)) fs.unlinkSync(bak);
-    } catch {
-      // ignore
-    }
-  }
-
-  hasItem(key: string): boolean {
-    return fs.existsSync(this.getPath(key));
-  }
-
-  listKeys(): string[] {
-    try {
-      if (!fs.existsSync(this.baseDir)) return [];
-      const files = fs.readdirSync(this.baseDir);
-      return files
-        .filter((f) => f.endsWith('.json') && !f.endsWith('.tmp') && !f.endsWith('.bak'))
-        .map((f) => f.replace(/\.json$/, ''));
-    } catch {
-      return [];
-    }
-  }
-
-  getSize(key: string): number {
-    try {
-      const p = this.getPath(key);
-      if (fs.existsSync(p)) {
-        return fs.statSync(p).size;
-      }
-    } catch {
-      // ignore
-    }
-    return 0;
-  }
-
-  restoreBackup(key: string): boolean {
-    const target = this.getPath(key);
-    const bak = path.join(this.baseDir, `${key}.json.bak`);
-    try {
-      if (fs.existsSync(bak)) {
-        fs.copyFileSync(bak, target);
-        return true;
-      }
-    } catch {
-      // ignore
-    }
-    return false;
-  }
-}
-
 export class SaveManager {
   public static readonly CURRENT_SCHEMA_VERSION = 1;
   public static readonly QUICK_SAVE_SLOT = 'quicksave';
   public static readonly AUTO_SAVE_SLOT = 'autosave';
 
   private storage: ISaveStorage;
-  private saveDir?: string;
 
-  constructor(customDirectoryOrStorage?: string | ISaveStorage) {
-    if (typeof customDirectoryOrStorage === 'object' && customDirectoryOrStorage !== null) {
-      this.storage = customDirectoryOrStorage;
-    } else if (typeof customDirectoryOrStorage === 'string') {
-      this.saveDir = customDirectoryOrStorage;
-      this.storage = new FileSaveStorage(customDirectoryOrStorage);
+  constructor(customStorage?: ISaveStorage) {
+    if (customStorage) {
+      this.storage = customStorage;
+    } else if (typeof window !== 'undefined' && window.localStorage) {
+      this.storage = new LocalStorageSaveStorage();
     } else {
-      // Auto-detect environment
-      if (typeof window !== 'undefined' && window.localStorage) {
-        this.storage = new LocalStorageSaveStorage();
-      } else {
-        // Node environment fallback
-        try {
-          const appData =
-            process.env.APPDATA ||
-            (process.platform === 'darwin'
-              ? `${process.env.HOME}/Library/Application Support`
-              : `${process.env.HOME}/.local/share`);
-          const defaultDir = path.join(appData || './', 'RashtraSovereignRepublic', 'saves');
-          this.saveDir = defaultDir;
-          this.storage = new FileSaveStorage(defaultDir);
-        } catch {
-          this.storage = new MemorySaveStorage();
-        }
-      }
+      this.storage = new MemorySaveStorage();
     }
   }
 
   public getSaveDirectory(): string | undefined {
-    return this.saveDir;
+    return (this.storage as any).saveDir;
   }
 
   public sanitizeSlotId(slotId: string): string {
@@ -542,6 +403,14 @@ export class SaveManager {
     return false;
   }
 
+  public delete(slotId: string): boolean {
+    return this.deleteSlot(slotId);
+  }
+
+  public getMetadata(slotId: string): SaveSlotMetadata | null {
+    return this.getSlotMetadata(slotId);
+  }
+
   public getSlotMetadata(slotId: string): SaveSlotMetadata | null {
     const clean = this.sanitizeSlotId(slotId);
     if (!this.storage.hasItem(clean)) return null;
@@ -598,8 +467,8 @@ export class SaveManager {
 
   public restoreSaveFromBackup(slotId: string): boolean {
     const clean = this.sanitizeSlotId(slotId);
-    if (this.storage instanceof FileSaveStorage) {
-      return this.storage.restoreBackup(clean);
+    if (typeof (this.storage as any).restoreBackup === 'function') {
+      return (this.storage as any).restoreBackup(clean);
     }
     // Web / Memory fallback: check if `${clean}.bak` exists in storage
     const bakKey = `${clean}.bak`;

@@ -2,12 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { GameSession } from '../../src/domain/models/GameSession';
 import { SimulationEngine } from '../../src/domain/services/SimulationEngine';
 import { DomesticEventRegistry } from '../../src/domain/events/DomesticEventRegistry';
-import { ActiveEventPrompt } from '../../src/domain/events/DomesticEvent';
 import { ResolveEventChoiceCommand } from '../../src/domain/commands/EventTaskCommands';
 import { LaunchAntiCorruptionCampaignCommand } from '../../src/domain/commands/GovernmentCommands';
 import { MinistryType, FundingLevel, EventCategory } from '../../src/domain/models/types';
-import { Minister, MinistryState } from '../../src/domain/models/MinistryState';
-import { DateOnly } from '../../src/domain/models/DateOnly';
+import { MinistryState } from '../../src/domain/models/MinistryState';
 
 describe('Domestic Events & Stability System', () => {
   it('DomesticEventRegistry_LoadsEvents_Accurately', () => {
@@ -72,6 +70,7 @@ describe('Domestic Events & Stability System', () => {
       date: session.clock.currentDate,
       title: floodEvt.title,
       description: floodEvt.description,
+      category: EventCategory.Emergency,
       choices: [...floodEvt.choices],
     };
 
@@ -102,6 +101,7 @@ describe('Domestic Events & Stability System', () => {
       date: session.clock.currentDate,
       title: floodEvt.title,
       description: floodEvt.description,
+      category: EventCategory.Emergency,
       choices: [...floodEvt.choices],
     };
 
