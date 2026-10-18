@@ -8,6 +8,16 @@
 
 ---
 
+## 🎮 Quick Start: How to Play (Standalone Windows)
+
+**No installation, game engine, or .NET SDK required!**
+
+1. Download **`Rashtra-v1.0.0-win-x64.zip`** below.
+2. Unzip the downloaded `.zip` file to any folder on your PC.
+3. Double-click **`Rashtra.exe`** (or **`Play-Rashtra.bat`**) to start playing immediately.
+
+---
+
 ## 1. Executive Summary
 
 Rashtra: Sovereign Republic is an authoritative, clean-room Windows desktop strategy remake inspired by the verified gameplay loops of *India Simulator 2 Premium*. Built from first principles without proprietary code or third-party assets, Rashtra combines 100% verified gameplay parity with desktop-first visual design, high-density HUDs, mouse and keyboard controls, and an interactive geopolitical vector world map.

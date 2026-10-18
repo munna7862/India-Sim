@@ -4,6 +4,20 @@ A Windows desktop, clean-room re-implementation of the geopolitical presidential
 
 ---
 
+## 🎮 Quick Start: How to Play (Standalone Windows)
+
+**No game engines, SDKs, or installations required!**
+
+1. **Download:** Go to [GitHub Releases (v1.0.0)](https://github.com/munna7862/India-Sim/releases/tag/v1.0.0) and download **`Rashtra-v1.0.0-win-x64.zip`**.
+2. **Extract:** Right-click the `.zip` file and select **Extract All...** (to any folder on your PC).
+3. **Launch:** Open the extracted folder and double-click **`Rashtra.exe`** (or **`Play-Rashtra.bat`**).
+4. **Controls:**
+   - **Panels:** `F1` (Cabinet), `F2` (Tasks), `F3` (Events), `F4` (Economy), `F5` (QuickSave), `F6` (Diplomacy), `F7` (Military), `F8` (Achievements), `F9` (QuickLoad), `F10` (Settings).
+   - **Simulation Speed:** `Space` (Pause/Resume), `1` (1x), `2` (2x), `3` (3x).
+   - **World Map:** Left-click + drag to pan, mouse scroll to zoom.
+
+---
+
 ## Quick Navigation
 
 - **Master Execution Plan:** [`MASTER-PLAN.md`](file:///c:/Workspace/India-Sim/MASTER-PLAN.md)
