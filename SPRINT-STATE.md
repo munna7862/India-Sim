@@ -5,7 +5,7 @@
 - Active phase: 00 (Reference Research, Scope & Clean-Room Design)
 - Active sprint: 00-01 (Build the reference feature inventory)
 - Sprint status: Completed (Outputs verified and documented; awaiting human review)
-- Last verified commit: c1f710c (docs: complete Sprint 00-01 reference research and project foundation)
+- Last verified commit: 8c45345 (feat(agents): add Antigravity native workspace skills for all 11 personas)
 - Last CI run: None
 
 ## Current objective
