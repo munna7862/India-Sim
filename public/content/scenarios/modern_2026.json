@@ -1,0 +1,15 @@
+{
+  "id": "modern_2026",
+  "name": "Modern Era 2026",
+  "description": "Global geopolitical stage at the beginning of 2026.",
+  "startDate": "2026-01-01T00:00:00",
+  "defaultCountryId": "IND",
+  "supportedCountryIds": [
+    "IND",
+    "USA",
+    "CHN",
+    "RUS",
+    "GBR",
+    "PAK"
+  ]
+}

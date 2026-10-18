@@ -1,0 +1,20 @@
+{
+  "id": "GBR",
+  "name": "United Kingdom",
+  "capital": "London",
+  "isPlayable": true,
+  "startingTreasury": 40000000000.0,
+  "startingPopulation": 67000000,
+  "startingApproval": 48.0,
+  "startingQualityOfLiving": 80.0,
+  "startingStability": 74.0,
+  "incomeTaxRate": 0.20,
+  "corporateTaxRate": 0.25,
+  "vatRate": 0.20,
+  "facilities": {
+    "Farms": 25,
+    "Mines": 15,
+    "PowerPlants": 35,
+    "Factories": 35
+  }
+}

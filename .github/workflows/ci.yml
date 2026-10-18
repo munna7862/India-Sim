@@ -34,3 +34,17 @@ jobs:
 
     - name: Run Content Validator
       run: dotnet run --project tools/ContentValidator/ContentValidator.csproj -c Release --no-build
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install Node Dependencies
+      run: npm install
+
+    - name: Run TypeScript Domain Tests (Vitest)
+      run: npm test
+
+    - name: Build Web Application Bundle
+      run: npm run build

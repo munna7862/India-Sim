@@ -38,3 +38,13 @@ desktop.ini
 *.log
 *.tmp
 *.bak
+
+# --- Web / Node / TypeScript Artifacts ---
+node_modules/
+dist/
+dist-web/
+dist-desktop/
+release/
+coverage/
+.vite/
+*.tsbuildinfo

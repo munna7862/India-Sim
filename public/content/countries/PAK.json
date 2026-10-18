@@ -1,0 +1,20 @@
+{
+  "id": "PAK",
+  "name": "Islamic Republic of Pakistan",
+  "capital": "Islamabad",
+  "isPlayable": true,
+  "startingTreasury": 15000000000.0,
+  "startingPopulation": 240000000,
+  "startingApproval": 58.0,
+  "startingQualityOfLiving": 45.0,
+  "startingStability": 55.0,
+  "incomeTaxRate": 0.15,
+  "corporateTaxRate": 0.29,
+  "vatRate": 0.18,
+  "facilities": {
+    "Farms": 35,
+    "Mines": 18,
+    "PowerPlants": 20,
+    "Factories": 22
+  }
+}
