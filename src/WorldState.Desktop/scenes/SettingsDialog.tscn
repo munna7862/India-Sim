@@ -18,68 +18,159 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.65)
+color = Color(0, 0, 0, 0.7)
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(500, 400)
+custom_minimum_size = Vector2(620, 560)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -200.0
-offset_right = 250.0
-offset_bottom = 200.0
+offset_left = -310.0
+offset_top = -280.0
+offset_right = 310.0
+offset_bottom = 280.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
 layout_mode = 2
-theme_override_constants/margin_left = 24
+theme_override_constants/margin_left = 28
 theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
+theme_override_constants/margin_right = 28
 theme_override_constants/margin_bottom = 24
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 12
 
 [node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "SETTINGS"
+theme_override_font_sizes/font_size = 22
+text = "DESKTOP DISPLAY & GAMEPLAY SETTINGS"
 horizontal_alignment = 1
 
-[node name="MasterLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator1" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="AudioHeader" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.62, 0.04, 1)
+theme_override_font_sizes/font_size = 14
+text = "AUDIO CHANNELS"
+
+[node name="MasterHBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MasterLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/MasterHBox"]
+custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 text = "Master Volume"
 
-[node name="MasterVolumeSlider" type="HSlider" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="MasterVolumeSlider" type="HSlider" parent="PanelContainer/MarginContainer/VBoxContainer/MasterHBox"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
 value = 80.0
 
-[node name="MusicLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="MusicHBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MusicLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/MusicHBox"]
+custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 text = "Music Volume"
 
-[node name="MusicVolumeSlider" type="HSlider" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="MusicVolumeSlider" type="HSlider" parent="PanelContainer/MarginContainer/VBoxContainer/MusicHBox"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
 value = 70.0
 
-[node name="SfxLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="SfxHBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SfxLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/SfxHBox"]
+custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 text = "Sound Effects (SFX)"
 
-[node name="SfxVolumeSlider" type="HSlider" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="SfxVolumeSlider" type="HSlider" parent="PanelContainer/MarginContainer/VBoxContainer/SfxHBox"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
 value = 90.0
 
-[node name="HSeparator" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="GraphicsHeader" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.23, 0.51, 0.96, 1)
+theme_override_font_sizes/font_size = 14
+text = "GRAPHICS & DESKTOP RESOLUTION"
+
+[node name="DisplayModeHBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="DisplayModeLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/DisplayModeHBox"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "Display Mode"
+
+[node name="DisplayModeOption" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/DisplayModeHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResolutionHBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ResolutionLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/ResolutionHBox"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "Resolution"
+
+[node name="ResolutionOption" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/ResolutionHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ScaleHBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScaleLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/ScaleHBox"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "UI Scaling"
+
+[node name="ScaleOption" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/ScaleHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PaletteHBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="PaletteLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/PaletteHBox"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "Map Theme Palette"
+
+[node name="PaletteOption" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/PaletteHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AutosaveHBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="AutosaveCheckbox" type="CheckBox" parent="PanelContainer/MarginContainer/VBoxContainer/AutosaveHBox"]
+layout_mode = 2
+text = "Enable Monthly Automatic Saving"
+
+[node name="HSeparator3" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
 [node name="CloseButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "Apply & Close"
+text = "Apply Settings & Close"

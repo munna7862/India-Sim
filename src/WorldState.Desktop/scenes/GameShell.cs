@@ -1,10 +1,14 @@
 using System;
+using System.IO;
 using System.Linq;
 using Godot;
 using WorldState.Domain.Commands;
+using WorldState.Domain.Data;
+using WorldState.Domain.Map;
 using WorldState.Domain.Models;
 using WorldState.Domain.Navigation;
 using WorldState.Domain.Services;
+using WorldState.Domain.Settings;
 using WorldState.Domain.ViewModels;
 
 namespace WorldState.Desktop.Scenes;
@@ -85,6 +89,30 @@ public partial class GameShell : Control
     private Label? _achievementsSummaryLabel;
     private VBoxContainer? _achievementsList;
     private string _activeEventFilter = "All";
+
+    // Phase 08 World Map & Desktop UX Controls
+    private WorldMapControl? _worldMap;
+    private WorldMapViewModel? _mapViewModel;
+    private Button? _zoomInBtn;
+    private Button? _zoomOutBtn;
+    private Button? _resetCameraBtn;
+    private Button? _paletteToggleBtn;
+    private PanelContainer? _tooltipCard;
+    private Label? _tooltipTextLabel;
+
+    private LineEdit? _tasksSearchBox;
+    private LineEdit? _diplomacySearchBox;
+    private LineEdit? _militarySearchBox;
+    private LineEdit? _eventsSearchBox;
+
+    private Panel? _actionConfirmModal;
+    private Label? _confirmTitle;
+    private Label? _confirmDescription;
+    private Label? _confirmCostLabel;
+    private Label? _confirmPrereqLabel;
+    private Button? _confirmCancelBtn;
+    private Button? _confirmAcceptBtn;
+    private Action? _pendingConfirmedAction;
 
     public override void _Ready()
 
@@ -199,9 +227,16 @@ public partial class GameShell : Control
                 var country = _session.GetPlayerCountry();
                 if (country != null)
                 {
-                    _engine.Dispatch(new ConductArmyDrillsCommand(country.Id));
-                    RefreshMilitaryView();
-                    RefreshHud();
+                    PromptActionConfirmation(
+                        "Conduct Army Drills",
+                        "Conduct nationwide military exercises to boost combat readiness (+15% attack bonus for 6 months). Cost: $100M.",
+                        100_000_000m,
+                        () =>
+                        {
+                            _engine.Dispatch(new ConductArmyDrillsCommand(country.Id));
+                            RefreshMilitaryView();
+                            RefreshHud();
+                        });
                 }
             };
         }
@@ -214,9 +249,16 @@ public partial class GameShell : Control
                 var country = _session.GetPlayerCountry();
                 if (country != null)
                 {
-                    _engine.Dispatch(new LaunchCounterTerrorismCommand(country.Id));
-                    RefreshMilitaryView();
-                    RefreshHud();
+                    PromptActionConfirmation(
+                        "Counter-Terrorism Operation",
+                        "Deploy specialized security operatives to eliminate insurgent cells and restore stability. Cost: $200M.",
+                        200_000_000m,
+                        () =>
+                        {
+                            _engine.Dispatch(new LaunchCounterTerrorismCommand(country.Id));
+                            RefreshMilitaryView();
+                            RefreshHud();
+                        });
                 }
             };
         }
@@ -253,7 +295,7 @@ public partial class GameShell : Control
         }
 
         _ministryList = GetNodeOrNull<VBoxContainer>("CabinetPanel/VBox/Scroll/MinistryList");
-        _tasksSummaryLabel = GetNodeOrNull<Label>("TasksPanel/VBox/SummaryLabel");
+        _tasksSummaryLabel = GetNodeOrNull<Label>("TasksPanel/VBox/ControlsHBox/SummaryLabel");
         _tasksList = GetNodeOrNull<VBoxContainer>("TasksPanel/VBox/Scroll/TasksList");
 
         _eventTitle = GetNodeOrNull<Label>("EmergencyDialog/VBox/EventTitle");
@@ -274,9 +316,16 @@ public partial class GameShell : Control
                 var country = _session.GetPlayerCountry();
                 if (country != null)
                 {
-                    _engine.Dispatch(new TakeLoanCommand(country.Id, 5_000_000_000m));
-                    RefreshEconomyView();
-                    RefreshHud();
+                    PromptActionConfirmation(
+                        "Borrow Central Bank Facility",
+                        "Borrow $5.0B from the Central Bank / IMF with monthly debt service and interest.",
+                        0m,
+                        () =>
+                        {
+                            _engine.Dispatch(new TakeLoanCommand(country.Id, 5_000_000_000m));
+                            RefreshEconomyView();
+                            RefreshHud();
+                        });
                 }
             };
         }
@@ -299,6 +348,70 @@ public partial class GameShell : Control
         _taxesContainer = GetNodeOrNull<VBoxContainer>("EconomyPanel/VBox/Scroll/EconomyContent/TaxesContainer");
         _facilitiesContainer = GetNodeOrNull<VBoxContainer>("EconomyPanel/VBox/Scroll/EconomyContent/FacilitiesContainer");
         _policiesContainer = GetNodeOrNull<VBoxContainer>("EconomyPanel/VBox/Scroll/EconomyContent/PoliciesContainer");
+
+        // Phase 08 World Map Initialization
+        _worldMap = GetNodeOrNull<WorldMapControl>("WorldMap");
+        var mapData = LoadMapData();
+        var countryRegistry = LoadCountryRegistry();
+        var userSettings = LoadUserSettings();
+        _mapViewModel = new WorldMapViewModel(mapData, _session, countryRegistry, userSettings.MapPalette);
+
+        if (_worldMap != null)
+        {
+            _worldMap.Initialize(_mapViewModel);
+            _worldMap.CountrySelected += OnMapCountrySelected;
+            _worldMap.CountryHovered += OnMapCountryHovered;
+        }
+
+        _zoomInBtn = GetNodeOrNull<Button>("MapOverlay/MapControlsHBox/ZoomInBtn");
+        _zoomOutBtn = GetNodeOrNull<Button>("MapOverlay/MapControlsHBox/ZoomOutBtn");
+        _resetCameraBtn = GetNodeOrNull<Button>("MapOverlay/MapControlsHBox/ResetCameraBtn");
+        _paletteToggleBtn = GetNodeOrNull<Button>("MapOverlay/MapControlsHBox/PaletteToggleBtn");
+
+        _tooltipCard = GetNodeOrNull<PanelContainer>("MapOverlay/TooltipCard");
+        _tooltipTextLabel = GetNodeOrNull<Label>("MapOverlay/TooltipCard/Margin/TooltipTextLabel");
+
+        if (_zoomInBtn != null) _zoomInBtn.Pressed += () => { _mapViewModel?.ZoomBy(1.2); _worldMap?.QueueRedraw(); };
+        if (_zoomOutBtn != null) _zoomOutBtn.Pressed += () => { _mapViewModel?.ZoomBy(1.0 / 1.2); _worldMap?.QueueRedraw(); };
+        if (_resetCameraBtn != null) _resetCameraBtn.Pressed += () => { _mapViewModel?.ResetCamera(); _worldMap?.QueueRedraw(); };
+        if (_paletteToggleBtn != null)
+        {
+            _paletteToggleBtn.Text = $"Theme: {_mapViewModel.ActivePalette.DisplayName}";
+            _paletteToggleBtn.Pressed += () =>
+            {
+                _mapViewModel?.CycleNextPalette();
+                if (_paletteToggleBtn != null && _mapViewModel != null)
+                {
+                    _paletteToggleBtn.Text = $"Theme: {_mapViewModel.ActivePalette.DisplayName}";
+                }
+                _worldMap?.QueueRedraw();
+            };
+        }
+
+        // Search Filters
+        _tasksSearchBox = GetNodeOrNull<LineEdit>("TasksPanel/VBox/ControlsHBox/TasksSearchBox");
+        if (_tasksSearchBox != null) _tasksSearchBox.TextChanged += _ => RefreshTasksView();
+
+        _diplomacySearchBox = GetNodeOrNull<LineEdit>("DiplomacyPanel/VBox/ControlsHBox/DiplomacySearchBox");
+        if (_diplomacySearchBox != null) _diplomacySearchBox.TextChanged += _ => RefreshDiplomacyView();
+
+        _militarySearchBox = GetNodeOrNull<LineEdit>("MilitaryPanel/VBox/SecurityActionsHBox/MilitarySearchBox");
+        if (_militarySearchBox != null) _militarySearchBox.TextChanged += _ => RefreshMilitaryView();
+
+        _eventsSearchBox = GetNodeOrNull<LineEdit>("EventsPanel/VBox/ControlsHBox/EventsSearchBox");
+        if (_eventsSearchBox != null) _eventsSearchBox.TextChanged += _ => RefreshEventsView();
+
+        // Confirmation Modal
+        _actionConfirmModal = GetNodeOrNull<Panel>("ActionConfirmModal");
+        _confirmTitle = GetNodeOrNull<Label>("ActionConfirmModal/Margin/VBox/Title");
+        _confirmDescription = GetNodeOrNull<Label>("ActionConfirmModal/Margin/VBox/Description");
+        _confirmCostLabel = GetNodeOrNull<Label>("ActionConfirmModal/Margin/VBox/CostLabel");
+        _confirmPrereqLabel = GetNodeOrNull<Label>("ActionConfirmModal/Margin/VBox/PrereqLabel");
+        _confirmCancelBtn = GetNodeOrNull<Button>("ActionConfirmModal/Margin/VBox/ButtonsHBox/CancelBtn");
+        _confirmAcceptBtn = GetNodeOrNull<Button>("ActionConfirmModal/Margin/VBox/ButtonsHBox/ConfirmBtn");
+
+        if (_confirmCancelBtn != null) _confirmCancelBtn.Pressed += DismissConfirmationModal;
+        if (_confirmAcceptBtn != null) _confirmAcceptBtn.Pressed += ConfirmPendingAction;
 
         _nav.ResetTo(ScreenRoute.WorldMap);
         RefreshHud();
@@ -503,7 +616,15 @@ public partial class GameShell : Control
             child.QueueFree();
         }
 
+        string searchQuery = _tasksSearchBox?.Text ?? string.Empty;
         var allTasks = tasksVm.PrincipalTasks.Concat(tasksVm.SecondaryTasks);
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            allTasks = allTasks.Where(t => t.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                           t.Description.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                           t.Category.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+        }
+
         foreach (var task in allTasks)
         {
             var taskBox = new VBoxContainer();
@@ -787,7 +908,15 @@ public partial class GameShell : Control
         var playerCountry = _session.GetPlayerCountry();
         if (playerCountry == null) return;
 
-        foreach (var nation in vm.ForeignNations)
+        string searchQuery = _diplomacySearchBox?.Text ?? string.Empty;
+        var nations = vm.ForeignNations;
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            nations = nations.Where(n => n.CountryName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                         n.CountryId.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        foreach (var nation in nations)
         {
             var card = new PanelContainer();
             var vbox = new VBoxContainer();
@@ -902,9 +1031,16 @@ public partial class GameShell : Control
                 };
                 warBtn.Pressed += () =>
                 {
-                    _engine.Dispatch(new DeclareWarCommand(playerCountry.Id, targetId));
-                    RefreshDiplomacyView();
-                    RefreshHud();
+                    PromptActionConfirmation(
+                        $"Declare Sovereign War on {nation.CountryName}",
+                        $"Formal declaration of war against {nation.CountryName} [{nation.CountryId}]. Active trade will be terminated and bilateral relations collapsed to -100.",
+                        0m,
+                        () =>
+                        {
+                            _engine.Dispatch(new DeclareWarCommand(playerCountry.Id, targetId));
+                            RefreshDiplomacyView();
+                            RefreshHud();
+                        });
                 };
                 actionRow.AddChild(warBtn);
             }
@@ -954,7 +1090,15 @@ public partial class GameShell : Control
 
         if (playerCountry == null) return;
 
-        foreach (var unit in vm.Units)
+        string searchQuery = _militarySearchBox?.Text ?? string.Empty;
+        var units = vm.Units;
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            units = units.Where(u => u.UnitName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                     u.Branch.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        foreach (var unit in units)
         {
             var row = new HBoxContainer();
             row.AddThemeConstantOverride("separation", 12);
@@ -1034,18 +1178,26 @@ public partial class GameShell : Control
             child.QueueFree();
         }
 
-        if (vm.Events.Count == 0)
+        string eventSearch = _eventsSearchBox?.Text ?? string.Empty;
+        var events = vm.Events;
+        if (!string.IsNullOrWhiteSpace(eventSearch))
+        {
+            events = events.Where(e => e.Title.Contains(eventSearch, StringComparison.OrdinalIgnoreCase) ||
+                                       e.Message.Contains(eventSearch, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        if (events.Count == 0)
         {
             var emptyLabel = new Label
             {
-                Text = "No events logged in this category.",
+                Text = "No events match the search query or filter.",
                 HorizontalAlignment = HorizontalAlignment.Center
             };
             _eventsList.AddChild(emptyLabel);
             return;
         }
 
-        foreach (var evt in vm.Events)
+        foreach (var evt in events)
         {
             var card = new PanelContainer();
             card.CustomMinimumSize = new Vector2(0, 56);
@@ -1242,6 +1394,41 @@ public partial class GameShell : Control
                     SetSpeed(ClockSpeed.Ultra);
                     GetViewport().SetInputAsHandled();
                     break;
+                case Key.Equal:
+                case Key.KpAdd:
+                    _mapViewModel?.ZoomBy(1.2);
+                    _worldMap?.QueueRedraw();
+                    GetViewport().SetInputAsHandled();
+                    break;
+                case Key.Minus:
+                case Key.KpSubtract:
+                    _mapViewModel?.ZoomBy(1.0 / 1.2);
+                    _worldMap?.QueueRedraw();
+                    GetViewport().SetInputAsHandled();
+                    break;
+                case Key.Key0:
+                case Key.Kp0:
+                    _mapViewModel?.ResetCamera();
+                    _worldMap?.QueueRedraw();
+                    GetViewport().SetInputAsHandled();
+                    break;
+                case Key.P:
+                    _mapViewModel?.CycleNextPalette();
+                    if (_paletteToggleBtn != null && _mapViewModel != null)
+                    {
+                        _paletteToggleBtn.Text = $"Theme: {_mapViewModel.ActivePalette.DisplayName}";
+                    }
+                    _worldMap?.QueueRedraw();
+                    GetViewport().SetInputAsHandled();
+                    break;
+                case Key.Enter:
+                case Key.KpEnter:
+                    if (_actionConfirmModal != null && _actionConfirmModal.Visible)
+                    {
+                        ConfirmPendingAction();
+                        GetViewport().SetInputAsHandled();
+                    }
+                    break;
                 case Key.F1:
                     ShowPanel(null);
                     GetViewport().SetInputAsHandled();
@@ -1285,6 +1472,11 @@ public partial class GameShell : Control
                         _session = loadResult.Session;
                         _engine = new SimulationEngine(_session);
                         _engine.OnMonthRollover += date => _saveManager.AutoSave(_session);
+                        if (_worldMap != null)
+                        {
+                            _mapViewModel = new WorldMapViewModel(LoadMapData(), _session, LoadCountryRegistry(), _mapViewModel?.ActivePalette.Name);
+                            _worldMap.Initialize(_mapViewModel);
+                        }
                         RefreshHud();
                     }
                     GetViewport().SetInputAsHandled();
@@ -1318,6 +1510,12 @@ public partial class GameShell : Control
 
     private void HandleEscape()
     {
+        if (_actionConfirmModal != null && _actionConfirmModal.Visible)
+        {
+            DismissConfirmationModal();
+            return;
+        }
+
         if (_cabinetPanel != null && _cabinetPanel.Visible)
         {
             ShowPanel(null);
@@ -1370,6 +1568,146 @@ public partial class GameShell : Control
         }
     }
 
+    private void OnMapCountrySelected(string countryId)
+    {
+        var player = _session.GetPlayerCountry();
+        if (player != null && string.Equals(countryId, player.Id, StringComparison.OrdinalIgnoreCase))
+        {
+            _mapViewModel?.FocusCountry(countryId);
+            ShowPanel(_cabinetPanel);
+        }
+        else
+        {
+            _mapViewModel?.FocusCountry(countryId);
+            ShowPanel(_diplomacyPanel);
+            RefreshDiplomacyView();
+        }
+    }
+
+    private void OnMapCountryHovered(string countryId, string tooltipText)
+    {
+        if (_tooltipCard != null && _tooltipTextLabel != null)
+        {
+            if (string.IsNullOrWhiteSpace(tooltipText))
+            {
+                _tooltipCard.Visible = false;
+            }
+            else
+            {
+                _tooltipCard.Visible = true;
+                _tooltipTextLabel.Text = tooltipText;
+            }
+        }
+    }
+
+    private void PromptActionConfirmation(string title, string description, decimal cost, Action onConfirm)
+    {
+        var player = _session.GetPlayerCountry();
+        decimal treasury = player?.Treasury ?? 0m;
+        var vm = ActionPromptViewModel.Create(title, description, cost, treasury, new[] { "Sovereign Executive Authority", "Treasury Solvency Check" });
+
+        if (_actionConfirmModal != null)
+        {
+            if (_confirmTitle != null) _confirmTitle.Text = vm.ActionTitle;
+            if (_confirmDescription != null) _confirmDescription.Text = vm.Description;
+            if (_confirmCostLabel != null)
+            {
+                _confirmCostLabel.Text = $"Cost: {vm.OneTimeCostFormatted} (Projected: {vm.ProjectedTreasuryFormatted})";
+                _confirmCostLabel.Modulate = vm.CanAfford ? new Color(0.96f, 0.62f, 0.04f) : new Color(0.93f, 0.27f, 0.27f);
+            }
+            if (_confirmPrereqLabel != null)
+            {
+                _confirmPrereqLabel.Text = vm.CanAfford ? "Prerequisites: Verified & Solvent" : "Prerequisites: INSUFFICIENT TREASURY FUNDS";
+                _confirmPrereqLabel.Modulate = vm.CanAfford ? new Color(0.06f, 0.72f, 0.5f) : new Color(0.93f, 0.27f, 0.27f);
+            }
+
+            if (_confirmAcceptBtn != null) _confirmAcceptBtn.Disabled = !vm.CanAfford;
+
+            _pendingConfirmedAction = onConfirm;
+            _actionConfirmModal.Visible = true;
+        }
+        else
+        {
+            if (treasury >= cost) onConfirm();
+        }
+    }
+
+    private void DismissConfirmationModal()
+    {
+        _pendingConfirmedAction = null;
+        if (_actionConfirmModal != null) _actionConfirmModal.Visible = false;
+    }
+
+    private void ConfirmPendingAction()
+    {
+        var act = _pendingConfirmedAction;
+        _pendingConfirmedAction = null;
+        if (_actionConfirmModal != null) _actionConfirmModal.Visible = false;
+        act?.Invoke();
+    }
+
+    private WorldMapData LoadMapData()
+    {
+        string mapFile = Path.Combine(Directory.GetCurrentDirectory(), "content", "map", "world_countries.geojson");
+        if (!File.Exists(mapFile))
+        {
+            mapFile = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "content", "map", "world_countries.geojson");
+        }
+
+        if (File.Exists(mapFile))
+        {
+            try
+            {
+                string json = File.ReadAllText(mapFile);
+                return GeoJsonMapLoader.LoadFromJson(json);
+            }
+            catch { }
+        }
+        return new WorldMapData();
+    }
+
+    private CountryRegistry LoadCountryRegistry()
+    {
+        var registry = new CountryRegistry();
+        string dir = Path.Combine(Directory.GetCurrentDirectory(), "content", "countries");
+        if (!Directory.Exists(dir))
+        {
+            dir = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "content", "countries");
+        }
+
+        if (Directory.Exists(dir))
+        {
+            foreach (var file in Directory.GetFiles(dir, "*.json"))
+            {
+                try
+                {
+                    string json = File.ReadAllText(file);
+                    var def = System.Text.Json.JsonSerializer.Deserialize<CountryDefinition>(json);
+                    if (def != null && !registry.TryGet(def.Id, out _))
+                    {
+                        registry.Register(def);
+                    }
+                }
+                catch { }
+            }
+        }
+        return registry;
+    }
+
+    private UserSettings LoadUserSettings()
+    {
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "user_data", "settings.json");
+        if (File.Exists(path))
+        {
+            try
+            {
+                var svc = new SettingsService();
+                return svc.DeserializeSettings(File.ReadAllText(path));
+            }
+            catch { }
+        }
+        return UserSettings.CreateDefault();
+    }
 
     private void RefreshHud()
     {
@@ -1396,17 +1734,7 @@ public partial class GameShell : Control
             _btnAchievements.TooltipText = $"F10: Achievements ({achVm.UnlockedCount}/{achVm.TotalAchievements} Unlocked)";
         }
 
-        var playerCountry = _session.GetPlayerCountry();
-        var mapTitle = GetNodeOrNull<Label>("CentralMapPlaceholder/VBox/MapTitle");
-        var mapInfo = GetNodeOrNull<Label>("CentralMapPlaceholder/VBox/MapInfo");
-        if (mapTitle != null && playerCountry != null)
-        {
-            mapTitle.Text = $"WORLD MAP • {playerCountry.Name.ToUpperInvariant()} [{playerCountry.Id}]";
-        }
-        if (mapInfo != null && playerCountry != null)
-        {
-            mapInfo.Text = $"Sovereign Administration Active • Scenario: {_session.ScenarioId} • Stability: {playerCountry.Stability:F0}%";
-        }
+        _worldMap?.QueueRedraw();
     }
 }
 

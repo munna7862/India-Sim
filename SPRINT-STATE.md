@@ -1,15 +1,15 @@
 # Sprint State
 
 - Project: Rashtra: Sovereign Republic (Desktop Remake)
-- Status: Phase 07 completed; Ready for Phase 08.
-- Active phase: 07 (Achievements, Events, Notifications & Progression) -> COMPLETED
-- Active sprint: 07-03 (Cross-system gameplay parity) -> COMPLETED; Next: 08-01 (Save/load robustness, metadata and multiple profiles)
-- Sprint status: Completed (All 3 Phase 07 sprints completed: Achievements and progression, World events, alerts and event history, Cross-system gameplay parity; 182/182 tests green)
-- Last verified commit: Phase 07 completion
-- Last CI run: Local `.\build.ps1` execution passed (182/182 tests pass, ContentValidator verified 6 countries, 1 scenario, 1 map dataset, 8 tasks, 5 domestic events, 6 world events, 6 economic policies, 12 military units, 8 achievements, 0 warnings/errors)
+- Status: Phase 08 completed; Ready for Phase 09.
+- Active phase: 08 (Original Graphics, Desktop Map & Visual Polish) -> COMPLETED
+- Active sprint: 08-03 (Visual regression and performance) -> COMPLETED; Next: 09-01 (Clean-room parity audit)
+- Sprint status: Completed (All 3 Phase 08 sprints completed: Original map skin & iconography, Desktop layouts & information density, Visual regression & performance; 208/208 tests green)
+- Last verified commit: Phase 08 completion
+- Last CI run: Local `.\build.ps1` execution passed (208/208 tests pass, ContentValidator verified 6 countries, 1 scenario, 1 map dataset, 8 tasks, 5 domestic events, 6 world events, 6 economic policies, 12 military units, 8 achievements, 0 warnings/errors)
 
 ## Current objective
-Transition to Phase 08 (Save/Load Polish, Settings, Menus & Visual System) and execute Sprint 08-01 (Save/load robustness, metadata and multiple profiles).
+Transition to Phase 09 (Verification, Release Hardening & Packaging) and execute Sprint 09-01 (Clean-room parity audit).
 
 ## Blockers / decisions
 - Reference Game Access Limitation: Direct Android APK execution is not supported natively in this Windows agent environment without an emulator. Publicly verified developer documentation, store descriptions, and gameplay captures were synthesized into `REFERENCE-INVENTORY.md` and `FEATURE-PARITY-MATRIX.md`. A companion checklist (`docs/research/REFERENCE-RESEARCH-CHECKLIST.md`) is provided for the human owner to log live-session numerical coefficients.
@@ -30,9 +30,12 @@ Transition to Phase 08 (Save/Load Polish, Settings, Menus & Visual System) and e
 - Diplomacy & Commercial Agreements (Sprint 06-01): Completed (`Diplomacy.cs`, `SendDiplomaticGiftCommand.cs`, `SignNonAggressionPactCommand.cs`, `SignTradeContractCommand.cs`, `CancelTradeContractCommand.cs`, monthly trade flow, `DiplomacyViewModel.cs`).
 - Military Inventory & Recruitment (Sprint 06-02): Completed (`content/military/military_units.json` 12 units, `MilitaryUnitRegistry.cs`, `RecruitMilitaryUnitsCommand.cs`, `DisbandMilitaryUnitsCommand.cs`, monthly military upkeep, `MilitaryViewModel.cs`).
 - Conflict & Security Actions (Sprint 06-03): Completed (`DeclareWarCommand.cs`, `ResolveCombatCommand.cs` with drill bonus & homeland defense, `SignPeaceTreatyCommand.cs`, `FundPresidentialProtectionCommand.cs`, `LaunchCounterTerrorismCommand.cs`, `DispatchCovertOperationCommand.cs`, `DiplomacyMilitaryTests.cs` with 165/165 passing tests).
-- Achievements and Progression (Sprint 07-01): Completed (`content/achievements/achievements.json` 8 achievements, `AchievementRegistry.cs`, `ClaimAchievementRewardCommand.cs`, `AchievementsViewModel.cs`, `GameShell.cs` / `GameShell.tscn` `AchievementsPanel`, F10 shortcut, `AchievementsProgressionTests.cs`).
-- World Events & Newsfeed History (Sprint 07-02): Completed (`content/events/world_events.json` 6 world events, `WorldEventRegistry.cs`, `WorldEventDefinition.cs`, `DismissNotificationCommand.cs`, `EventHistoryViewModel.cs`, `GameShell.cs` / `GameShell.tscn` `EventsPanel`, F8 shortcut, unread badge counter, `WorldEventsAndNotificationsTests.cs`).
+- Achievements and Progression (Sprint 07-01): Completed (`content/achievements/achievements.json` 8 achievements, `AchievementRegistry.cs`, `ClaimAchievementRewardCommand.cs`, `AchievementsViewModel.cs`, `AchievementsPanel`, `AchievementsProgressionTests.cs`).
+- World Events & Newsfeed History (Sprint 07-02): Completed (`content/events/world_events.json` 6 world events, `WorldEventRegistry.cs`, `WorldEventDefinition.cs`, `DismissNotificationCommand.cs`, `EventHistoryViewModel.cs`, `EventsPanel`, `WorldEventsAndNotificationsTests.cs`).
 - Cross-System Gameplay Parity (Sprint 07-03): Completed (`CrossSystemGameplayParityTests.cs` testing end-to-end loops across all systems, mid-simulation timed operations, emergency prompts, foreign treaties, and save/load persistence; 182/182 tests green).
+- Map Skin, Palettes & Interactive Map (Sprint 08-01): Completed (`MapTheme.cs`, `MapPalette`, `MapThemeRegistry` with 3 palettes, stance-based diplomatic coloring, `WorldMapViewModel.cs`, `WorldMapControl.cs`, `WorldMapViewModelTests.cs`).
+- Desktop Layouts & Information Density (Sprint 08-02): Completed (`DesktopLayoutHelper.cs`, responsive tiering, task & nation filtering, hotkeys F1-F10/Space/1-3, search bars, action confirmation dialogs, `SettingsDialog.tscn` upgrades, `DesktopLayoutAndSettingsTests.cs`).
+- Visual Regression & Performance (Sprint 08-03): Completed (`MapPerformanceTests.cs` benchmark, projection caching, simulation invariants, 208/208 tests green, `build.ps1` passed).
 - Map Data Licensing (ADR-002): Natural Earth Admin 0 Public Domain vector datasets integrated under `GEO-01`.
 - Branding & Clean-Room Policy: Resolved in Sprint 00-02 via `docs/legal/CLEAN-ROOM-POLICY.md` (Working title: "Rashtra: Sovereign Republic").
 
@@ -63,10 +66,10 @@ Transition to Phase 08 (Save/Load Polish, Settings, Menus & Visual System) and e
 | 07-01 | Completed | `content/achievements/achievements.json`, `AchievementRegistry.cs`, `ClaimAchievementRewardCommand.cs`, `AchievementsViewModel.cs`, `AchievementsPanel`, `AchievementsProgressionTests.cs` |
 | 07-02 | Completed | `content/events/world_events.json`, `WorldEventRegistry.cs`, `DismissNotificationCommand.cs`, `EventHistoryViewModel.cs`, `EventsPanel`, `WorldEventsAndNotificationsTests.cs` |
 | 07-03 | Completed | `CrossSystemGameplayParityTests.cs` (182/182 tests pass, `build.ps1` green) |
-| 08-01 | Ready / Next | `plans/sprints/08-01.md` |
-| 08-02 | Not started | None |
-| 08-03 | Not started | None |
-| 09-01 | Not started | None |
+| 08-01 | Completed | `MapTheme.cs`, `MapPalette`, `WorldMapControl.cs`, `WorldMapViewModelTests.cs` |
+| 08-02 | Completed | `DesktopLayoutHelper.cs`, `GameShell.cs`, `CountrySelect.cs`, `SettingsDialog.cs`, `DesktopLayoutAndSettingsTests.cs` |
+| 08-03 | Completed | `MapPerformanceTests.cs`, `PHASE-08.md`, `FEATURE-PARITY-MATRIX.md`, `ASSET-AND-DATA-PROVENANCE.md` (208/208 tests pass, `build.ps1` green) |
+| 09-01 | Ready / Next | `plans/sprints/09-01.md` |
 | 09-02 | Not started | None |
 | 09-03 | Not started | None |
 
