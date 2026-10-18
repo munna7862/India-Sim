@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Godot;
 using WorldState.Domain.Commands;
@@ -31,10 +32,12 @@ public partial class GameShell : Control
     private Button? _btnOverview;
     private Button? _btnCabinet;
     private Button? _btnTasks;
+    private Button? _btnEconomy;
 
     private Panel? _cabinetPanel;
     private Panel? _tasksPanel;
     private Panel? _emergencyDialog;
+    private Panel? _economyPanel;
 
     private Label? _ideologyLabel;
     private Button? _changeIdeologyBtn;
@@ -45,6 +48,17 @@ public partial class GameShell : Control
     private Label? _eventTitle;
     private Label? _eventDescription;
     private VBoxContainer? _choicesContainer;
+
+    // Phase 05 Economy Controls
+    private Label? _gdpLabel;
+    private Label? _creditRatingLabel;
+    private Label? _debtLabel;
+    private Button? _borrowBtn;
+    private Button? _repayBtn;
+    private Label? _ledgerSummaryLabel;
+    private VBoxContainer? _taxesContainer;
+    private VBoxContainer? _facilitiesContainer;
+    private VBoxContainer? _policiesContainer;
 
     public override void _Ready()
     {
@@ -80,21 +94,27 @@ public partial class GameShell : Control
         _btnOverview = GetNodeOrNull<Button>("LeftNavRail/VBox/BtnOverview");
         _btnCabinet = GetNodeOrNull<Button>("LeftNavRail/VBox/BtnCabinet");
         _btnTasks = GetNodeOrNull<Button>("LeftNavRail/VBox/BtnTasks");
+        _btnEconomy = GetNodeOrNull<Button>("LeftNavRail/VBox/BtnEconomy");
 
         if (_btnOverview != null) _btnOverview.Pressed += () => ShowPanel(null);
         if (_btnCabinet != null) _btnCabinet.Pressed += () => ShowPanel(_cabinetPanel);
         if (_btnTasks != null) _btnTasks.Pressed += () => ShowPanel(_tasksPanel);
+        if (_btnEconomy != null) _btnEconomy.Pressed += () => ShowPanel(_economyPanel);
 
         // Panels
         _cabinetPanel = GetNodeOrNull<Panel>("CabinetPanel");
         _tasksPanel = GetNodeOrNull<Panel>("TasksPanel");
         _emergencyDialog = GetNodeOrNull<Panel>("EmergencyDialog");
+        _economyPanel = GetNodeOrNull<Panel>("EconomyPanel");
 
         var closeCabinet = GetNodeOrNull<Button>("CabinetPanel/VBox/Header/CloseButton");
         if (closeCabinet != null) closeCabinet.Pressed += () => ShowPanel(null);
 
         var closeTasks = GetNodeOrNull<Button>("TasksPanel/VBox/Header/CloseButton");
         if (closeTasks != null) closeTasks.Pressed += () => ShowPanel(null);
+
+        var closeEconomy = GetNodeOrNull<Button>("EconomyPanel/VBox/Header/CloseButton");
+        if (closeEconomy != null) closeEconomy.Pressed += () => ShowPanel(null);
 
         _ideologyLabel = GetNodeOrNull<Label>("CabinetPanel/VBox/IdeologyHBox/IdeologyLabel");
         _changeIdeologyBtn = GetNodeOrNull<Button>("CabinetPanel/VBox/IdeologyHBox/ChangeIdeologyBtn");
@@ -111,6 +131,46 @@ public partial class GameShell : Control
         _eventDescription = GetNodeOrNull<Label>("EmergencyDialog/VBox/EventDescription");
         _choicesContainer = GetNodeOrNull<VBoxContainer>("EmergencyDialog/VBox/ChoicesContainer");
 
+        // Economy Panel controls
+        _gdpLabel = GetNodeOrNull<Label>("EconomyPanel/VBox/MacroSummaryHBox/GdpLabel");
+        _creditRatingLabel = GetNodeOrNull<Label>("EconomyPanel/VBox/MacroSummaryHBox/CreditRatingLabel");
+        _debtLabel = GetNodeOrNull<Label>("EconomyPanel/VBox/MacroSummaryHBox/DebtLabel");
+        _borrowBtn = GetNodeOrNull<Button>("EconomyPanel/VBox/MacroSummaryHBox/BorrowBtn");
+        _repayBtn = GetNodeOrNull<Button>("EconomyPanel/VBox/MacroSummaryHBox/RepayBtn");
+
+        if (_borrowBtn != null)
+        {
+            _borrowBtn.Pressed += () =>
+            {
+                var country = _session.GetPlayerCountry();
+                if (country != null)
+                {
+                    _engine.Dispatch(new TakeLoanCommand(country.Id, 5_000_000_000m));
+                    RefreshEconomyView();
+                    RefreshHud();
+                }
+            };
+        }
+
+        if (_repayBtn != null)
+        {
+            _repayBtn.Pressed += () =>
+            {
+                var country = _session.GetPlayerCountry();
+                if (country != null)
+                {
+                    _engine.Dispatch(new RepayLoanCommand(country.Id, 5_000_000_000m));
+                    RefreshEconomyView();
+                    RefreshHud();
+                }
+            };
+        }
+
+        _ledgerSummaryLabel = GetNodeOrNull<Label>("EconomyPanel/VBox/Scroll/EconomyContent/LedgerSummaryLabel");
+        _taxesContainer = GetNodeOrNull<VBoxContainer>("EconomyPanel/VBox/Scroll/EconomyContent/TaxesContainer");
+        _facilitiesContainer = GetNodeOrNull<VBoxContainer>("EconomyPanel/VBox/Scroll/EconomyContent/FacilitiesContainer");
+        _policiesContainer = GetNodeOrNull<VBoxContainer>("EconomyPanel/VBox/Scroll/EconomyContent/PoliciesContainer");
+
         _nav.ResetTo(ScreenRoute.WorldMap);
         RefreshHud();
     }
@@ -126,6 +186,7 @@ public partial class GameShell : Control
     {
         if (_cabinetPanel != null) _cabinetPanel.Visible = (_cabinetPanel == targetPanel);
         if (_tasksPanel != null) _tasksPanel.Visible = (_tasksPanel == targetPanel);
+        if (_economyPanel != null) _economyPanel.Visible = (_economyPanel == targetPanel);
 
         if (targetPanel == _cabinetPanel)
         {
@@ -136,6 +197,11 @@ public partial class GameShell : Control
         {
             _nav.NavigateTo(ScreenRoute.TasksAndObjectives);
             RefreshTasksView();
+        }
+        else if (targetPanel == _economyPanel)
+        {
+            _nav.NavigateTo(ScreenRoute.EconomyAndBudget);
+            RefreshEconomyView();
         }
         else
         {
@@ -335,6 +401,177 @@ public partial class GameShell : Control
         }
     }
 
+    private void RefreshEconomyView()
+    {
+        var country = _session.GetPlayerCountry();
+        if (country == null) return;
+
+        var vm = EconomyViewModel.FromCountry(country, _engine.PolicyRegistry);
+
+        if (_gdpLabel != null)
+        {
+            _gdpLabel.Text = $"Monthly GDP: ${vm.MonthlyGdp / 1_000_000_000m:F1}B (Annual: ${vm.AnnualGdp / 1_000_000_000m:F1}B)";
+        }
+        if (_creditRatingLabel != null)
+        {
+            _creditRatingLabel.Text = $"Credit Rating: {vm.CreditRating} ({vm.MonthlyInterestRate * 100:F2}%/mo)";
+        }
+        if (_debtLabel != null)
+        {
+            _debtLabel.Text = $"Debt: ${vm.Debt / 1_000_000_000m:F1}B (Ceiling: ${vm.DebtCeiling / 1_000_000_000m:F1}B | Ratio: {vm.DebtToGdpRatio * 100:F1}%)";
+        }
+        if (_ledgerSummaryLabel != null)
+        {
+            _ledgerSummaryLabel.Text = $"Projected Revenue: ${vm.ProjectedGrossRevenue / 1_000_000_000m:F2}B | Expenses: ${vm.ProjectedGrossExpenses / 1_000_000_000m:F2}B | Net: {(vm.ProjectedNetBalance >= 0 ? "+" : "")}${vm.ProjectedNetBalance / 1_000_000_000m:F2}B/mo (Efficiency: {vm.ProjectedTaxEfficiency * 100:F1}%)";
+        }
+
+        // 1. Taxes Container
+        if (_taxesContainer != null)
+        {
+            foreach (Node child in _taxesContainer.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            var taxes = new (string Name, TaxType Type, double Rate, decimal ProjectedRev)[]
+            {
+                ("Income Tax", TaxType.IncomeTax, vm.IncomeTaxRate, vm.ProjectedIncomeTaxRevenue),
+                ("Corporate Tax", TaxType.CorporateTax, vm.CorporateTaxRate, vm.ProjectedCorporateTaxRevenue),
+                ("VAT / Sales Tax", TaxType.Vat, vm.VatRate, vm.ProjectedVatRevenue)
+            };
+
+            foreach (var tax in taxes)
+            {
+                var row = new HBoxContainer { CustomMinimumSize = new Vector2(0, 32) };
+                var nameLabel = new Label
+                {
+                    Text = $"{tax.Name}: {tax.Rate * 100:F1}% (Projected: ${tax.ProjectedRev / 1_000_000_000m:F2}B/mo)",
+                    SizeFlagsHorizontal = SizeFlags.ExpandFill
+                };
+                row.AddChild(nameLabel);
+
+                var minusBtn = new Button { Text = "-1%", CustomMinimumSize = new Vector2(60, 0) };
+                var plusBtn = new Button { Text = "+1%", CustomMinimumSize = new Vector2(60, 0) };
+
+                var taxType = tax.Type;
+                var currentRate = tax.Rate;
+
+                minusBtn.Pressed += () =>
+                {
+                    double nextRate = Math.Clamp(currentRate - 0.01, 0.0, 1.0);
+                    _engine.Dispatch(new AdjustTaxRateCommand(country.Id, taxType, nextRate));
+                    RefreshEconomyView();
+                    RefreshHud();
+                };
+
+                plusBtn.Pressed += () =>
+                {
+                    double nextRate = Math.Clamp(currentRate + 0.01, 0.0, 1.0);
+                    _engine.Dispatch(new AdjustTaxRateCommand(country.Id, taxType, nextRate));
+                    RefreshEconomyView();
+                    RefreshHud();
+                };
+
+                row.AddChild(minusBtn);
+                row.AddChild(plusBtn);
+                _taxesContainer.AddChild(row);
+            }
+        }
+
+        // 2. Facilities Container
+        if (_facilitiesContainer != null)
+        {
+            foreach (Node child in _facilitiesContainer.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            foreach (var f in vm.Facilities)
+            {
+                var row = new HBoxContainer { CustomMinimumSize = new Vector2(0, 36) };
+                var infoLabel = new Label
+                {
+                    Text = $"{f.FacilityType}: {f.CurrentCount} built ({f.PrimaryProduction}) • Cost: ${f.MoneyCost / 1_000_000m:F0}M, {f.IronCost:F0} Iron",
+                    SizeFlagsHorizontal = SizeFlags.ExpandFill
+                };
+                row.AddChild(infoLabel);
+
+                var buildBtn = new Button
+                {
+                    Text = "+ Build 1x",
+                    CustomMinimumSize = new Vector2(100, 0),
+                    Disabled = !f.CanAfford
+                };
+
+                var facType = f.FacilityType;
+                buildBtn.Pressed += () =>
+                {
+                    _engine.Dispatch(new ConstructFacilityCommand(country.Id, facType, 1));
+                    RefreshEconomyView();
+                    RefreshHud();
+                };
+
+                row.AddChild(buildBtn);
+                _facilitiesContainer.AddChild(row);
+            }
+        }
+
+        // 3. Policies Container
+        if (_policiesContainer != null)
+        {
+            foreach (Node child in _policiesContainer.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            foreach (var p in vm.Policies)
+            {
+                var row = new HBoxContainer { CustomMinimumSize = new Vector2(0, 40) };
+                var pLabel = new Label
+                {
+                    Text = $"[{p.Category.ToUpperInvariant()}] {p.Name} {(p.IsActive ? "★ ACTIVE" : "")}\n  Upfront: ${p.UpfrontCost / 1_000_000m:F0}M | Upkeep: ${p.MonthlyUpkeep / 1_000_000m:F0}M/mo | {p.EffectSummary}",
+                    SizeFlagsHorizontal = SizeFlags.ExpandFill
+                };
+                row.AddChild(pLabel);
+
+                var polId = p.Id;
+                if (p.IsActive)
+                {
+                    var revokeBtn = new Button
+                    {
+                        Text = "Revoke",
+                        CustomMinimumSize = new Vector2(90, 0)
+                    };
+                    revokeBtn.Pressed += () =>
+                    {
+                        _engine.Dispatch(new RevokeEconomicPolicyCommand(country.Id, polId));
+                        RefreshEconomyView();
+                        RefreshHud();
+                    };
+                    row.AddChild(revokeBtn);
+                }
+                else
+                {
+                    var enactBtn = new Button
+                    {
+                        Text = "Enact",
+                        CustomMinimumSize = new Vector2(90, 0),
+                        Disabled = !p.CanAfford
+                    };
+                    enactBtn.Pressed += () =>
+                    {
+                        _engine.Dispatch(new EnactEconomicPolicyCommand(country.Id, polId));
+                        RefreshEconomyView();
+                        RefreshHud();
+                    };
+                    row.AddChild(enactBtn);
+                }
+
+                _policiesContainer.AddChild(row);
+            }
+        }
+    }
+
     private void CheckEmergencyPrompt()
     {
         if (_emergencyDialog == null) return;
@@ -413,6 +650,10 @@ public partial class GameShell : Control
                     ShowPanel(_tasksPanel);
                     GetViewport().SetInputAsHandled();
                     break;
+                case Key.F4:
+                    ShowPanel(_economyPanel);
+                    GetViewport().SetInputAsHandled();
+                    break;
                 case Key.F5:
                     _saveManager.QuickSave(_session);
                     GetViewport().SetInputAsHandled();
@@ -464,6 +705,12 @@ public partial class GameShell : Control
         }
 
         if (_tasksPanel != null && _tasksPanel.Visible)
+        {
+            ShowPanel(null);
+            return;
+        }
+
+        if (_economyPanel != null && _economyPanel.Visible)
         {
             ShowPanel(null);
             return;

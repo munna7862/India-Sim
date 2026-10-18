@@ -77,4 +77,12 @@ public class SimulationClock
             OnMonthPassed?.Invoke(CurrentDate);
         }
     }
+
+    public void AdvanceDays(int days)
+    {
+        for (int i = 0; i < days; i++)
+        {
+            AdvanceDay();
+        }
+    }
 }

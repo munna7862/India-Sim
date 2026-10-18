@@ -1,15 +1,15 @@
 # Sprint State
 
 - Project: Rashtra: Sovereign Republic (Desktop Remake)
-- Status: Phase 04 completed; Ready for Phase 05.
-- Active phase: 04 (Government, Tasks & Internal Affairs) -> COMPLETED
-- Active sprint: 04-03 (Domestic events, approval and stability) -> COMPLETED; Next: 05-01 (Taxes, treasury and revenue modeling)
-- Sprint status: Completed (All 3 Phase 04 sprints completed: Cabinet ministries and appointments, Tasks and objectives, Domestic events, approval and stability; 124/124 tests green)
-- Last verified commit: Phase 04 completion
-- Last CI run: Local `.\build.ps1` execution passed (124/124 tests pass, ContentValidator verified 6 countries, 1 scenario, 1 map dataset, 8 tasks, 5 domestic events, 0 warnings/errors)
+- Status: Phase 05 completed; Ready for Phase 06.
+- Active phase: 05 (Economy, Budget & Development) -> COMPLETED
+- Active sprint: 05-03 (Economic loop parity and regression) -> COMPLETED; Next: 06-01 (Diplomacy and commercial agreements)
+- Sprint status: Completed (All 3 Phase 05 sprints completed: National budget and revenue, Economic policies and development actions, Economic loop parity and regression; 145/145 tests green)
+- Last verified commit: Phase 05 completion
+- Last CI run: Local `.\build.ps1` execution passed (145/145 tests pass, ContentValidator verified 6 countries, 1 scenario, 1 map dataset, 8 tasks, 5 domestic events, 6 economic policies, 0 warnings/errors)
 
 ## Current objective
-Transition to Phase 05 (Economy, Budget, Trade & Resources) and execute Sprint 05-01 (Taxes, treasury and revenue modeling).
+Transition to Phase 06 (Diplomacy, Military & International Actions) and execute Sprint 06-01 (Diplomacy and commercial agreements).
 
 ## Blockers / decisions
 - Reference Game Access Limitation: Direct Android APK execution is not supported natively in this Windows agent environment without an emulator. Publicly verified developer documentation, store descriptions, and gameplay captures were synthesized into `REFERENCE-INVENTORY.md` and `FEATURE-PARITY-MATRIX.md`. A companion checklist (`docs/research/REFERENCE-RESEARCH-CHECKLIST.md`) is provided for the human owner to log live-session numerical coefficients.
@@ -24,6 +24,9 @@ Transition to Phase 05 (Economy, Budget, Trade & Resources) and execute Sprint 0
 - Cabinet Ministries & Ideologies (Sprint 04-01): Completed (`IdeologyDefinition`, `ChangeIdeologyCommand`, `AppointMinisterCommand`, `DismissMinisterCommand`, `MinisterRosterService`, `GovernmentViewModel`, `CabinetPanel`).
 - Presidential Tasks & Objectives (Sprint 04-02): Completed (`content/tasks/tasks_modern.json`, `TaskRegistry`, `TasksViewModel`, prerequisite task unlocking, automated evaluation against facilities and indicators, `TasksPanel`).
 - Domestic Events & National Indicators (Sprint 04-03): Completed (`content/events/domestic_events.json`, `DomesticEventRegistry`, `ActiveEventPrompt`, `ResolveEventChoiceCommand`, `LaunchAntiCorruptionCampaignCommand`, `UpdateNationalIndicators()`, `EmergencyDialog`).
+- National Budget & Revenue (Sprint 05-01): Completed (`MonthlyBudgetReport`, `ExecuteMonthlyLedgerCommand`, `AdjustTaxRateCommand`, `TakeLoanCommand`, `RepayLoanCommand`, variable interest rates by credit rating AAA-D, sovereign debt distress alerts).
+- Economic Policies & Development Actions (Sprint 05-02): Completed (`content/policies/economic_policies.json`, `EconomicPolicyRegistry`, `EnactEconomicPolicyCommand`, `RevokeEconomicPolicyCommand`, OilWells, UraniumMines, facility and population resource consumption balance).
+- Economic Loop Parity & Desktop Shell (Sprint 05-03): Completed (`EconomyViewModel`, `GameShell.cs` / `GameShell.tscn` `EconomyPanel`, F4 shortcut, multi-month deterministic progression, `EconomyBudgetTests.cs` with 145/145 passing tests).
 - Map Data Licensing (ADR-002): Natural Earth Admin 0 Public Domain vector datasets integrated under `GEO-01`.
 - Branding & Clean-Room Policy: Resolved in Sprint 00-02 via `docs/legal/CLEAN-ROOM-POLICY.md` (Working title: "Rashtra: Sovereign Republic").
 
@@ -45,10 +48,10 @@ Transition to Phase 05 (Economy, Budget, Trade & Resources) and execute Sprint 0
 | 04-01 | Completed | `Ideology.cs`, `ChangeIdeologyCommand.cs`, `MinisterRosterService.cs`, `GovernmentViewModel.cs`, `GovernmentAndCabinetTests.cs` (108/108 tests pass) |
 | 04-02 | Completed | `content/tasks/tasks_modern.json`, `TaskRegistry.cs`, `TasksViewModel.cs`, `PresidentialTasksTests.cs` (115/115 tests pass) |
 | 04-03 | Completed | `content/events/domestic_events.json`, `DomesticEventRegistry.cs`, `ResolveEventChoiceCommand.cs`, `DomesticEventsAndStabilityTests.cs` (124/124 tests pass) |
-| 05-01 | Ready / Next | `plans/sprints/05-01.md` |
-| 05-02 | Not started | None |
-| 05-03 | Not started | None |
-| 06-01 | Not started | None |
+| 05-01 | Completed | `MonthlyBudgetReport.cs`, `ExecuteMonthlyLedgerCommand.cs`, `AdjustTaxRateCommand.cs`, `TakeLoanCommand.cs`, `RepayLoanCommand.cs`, `EconomyBudgetTests.cs` (136/136 tests pass) |
+| 05-02 | Completed | `content/policies/economic_policies.json`, `EconomicPolicy.cs`, `EnactEconomicPolicyCommand.cs`, `RevokeEconomicPolicyCommand.cs`, `ContentValidator` (140/140 tests pass) |
+| 05-03 | Completed | `EconomyViewModel.cs`, `GameShell.cs`, `GameShell.tscn`, `EconomyBudgetTests.cs` (145/145 tests pass, `build.ps1` green) |
+| 06-01 | Ready / Next | `plans/sprints/06-01.md` |
 | 06-02 | Not started | None |
 | 06-03 | Not started | None |
 | 07-01 | Not started | None |

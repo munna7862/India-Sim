@@ -382,3 +382,126 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
+[node name="EconomyPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 72.0
+offset_top = 64.0
+offset_right = -16.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="EconomyPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="EconomyPanel/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="EconomyPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "NATIONAL ECONOMY, BUDGET & FISCAL POLICY"
+
+[node name="CloseButton" type="Button" parent="EconomyPanel/VBox/Header"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "✕"
+
+[node name="MacroSummaryHBox" type="HBoxContainer" parent="EconomyPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="GdpLabel" type="Label" parent="EconomyPanel/VBox/MacroSummaryHBox"]
+layout_mode = 2
+text = "Monthly GDP: $140.0B"
+
+[node name="CreditRatingLabel" type="Label" parent="EconomyPanel/VBox/MacroSummaryHBox"]
+layout_mode = 2
+text = "Rating: AAA (0.50%/mo)"
+
+[node name="DebtLabel" type="Label" parent="EconomyPanel/VBox/MacroSummaryHBox"]
+layout_mode = 2
+text = "Debt: $0.0B (Ceiling: $280.0B)"
+
+[node name="BorrowBtn" type="Button" parent="EconomyPanel/VBox/MacroSummaryHBox"]
+layout_mode = 2
+text = "+ Borrow $5B"
+
+[node name="RepayBtn" type="Button" parent="EconomyPanel/VBox/MacroSummaryHBox"]
+layout_mode = 2
+text = "- Repay $5B"
+
+[node name="Scroll" type="ScrollContainer" parent="EconomyPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EconomyContent" type="VBoxContainer" parent="EconomyPanel/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="LedgerSectionTitle" type="Label" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.231, 0.51, 0.965, 1)
+theme_override_font_sizes/font_size = 16
+text = "MONTHLY BUDGET LEDGER BREAKDOWN"
+
+[node name="LedgerSummaryLabel" type="Label" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
+layout_mode = 2
+text = "Projected Revenue: $28.7B | Expenses: $2.1B | Net Balance: +$26.6B / month"
+
+[node name="HSeparator1" type="HSeparator" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
+layout_mode = 2
+
+[node name="TaxSectionTitle" type="Label" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.231, 0.51, 0.965, 1)
+theme_override_font_sizes/font_size = 16
+text = "TAX POLICY SLIDERS"
+
+[node name="TaxesContainer" type="VBoxContainer" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HSeparator2" type="HSeparator" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
+layout_mode = 2
+
+[node name="FacilitiesSectionTitle" type="Label" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.231, 0.51, 0.965, 1)
+theme_override_font_sizes/font_size = 16
+text = "PRODUCTION FACILITIES & COMMODITY UPGRADES"
+
+[node name="FacilitiesContainer" type="VBoxContainer" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HSeparator3" type="HSeparator" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
+layout_mode = 2
+
+[node name="PoliciesSectionTitle" type="Label" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.231, 0.51, 0.965, 1)
+theme_override_font_sizes/font_size = 16
+text = "ECONOMIC DEVELOPMENT POLICIES & PROGRAMS"
+
+[node name="PoliciesContainer" type="VBoxContainer" parent="EconomyPanel/VBox/Scroll/EconomyContent"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+
