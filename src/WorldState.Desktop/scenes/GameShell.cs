@@ -74,6 +74,18 @@ public partial class GameShell : Control
     private Button? _protectionLevelBtn;
     private VBoxContainer? _unitsList;
 
+    // Phase 07 Events & Achievements Controls
+    private Button? _btnEvents;
+    private Button? _btnAchievements;
+    private Panel? _eventsPanel;
+    private Panel? _achievementsPanel;
+    private Label? _eventsSummaryLabel;
+    private Button? _markAllReadBtn;
+    private VBoxContainer? _eventsList;
+    private Label? _achievementsSummaryLabel;
+    private VBoxContainer? _achievementsList;
+    private string _activeEventFilter = "All";
+
     public override void _Ready()
 
     {
@@ -120,6 +132,12 @@ public partial class GameShell : Control
         if (_btnDiplomacy != null) _btnDiplomacy.Pressed += () => ShowPanel(_diplomacyPanel);
         if (_btnMilitary != null) _btnMilitary.Pressed += () => ShowPanel(_militaryPanel);
 
+        _btnEvents = GetNodeOrNull<Button>("LeftNavRail/VBox/BtnEvents");
+        _btnAchievements = GetNodeOrNull<Button>("LeftNavRail/VBox/BtnAchievements");
+
+        if (_btnEvents != null) _btnEvents.Pressed += () => ShowPanel(_eventsPanel);
+        if (_btnAchievements != null) _btnAchievements.Pressed += () => ShowPanel(_achievementsPanel);
+
         // Panels
         _cabinetPanel = GetNodeOrNull<Panel>("CabinetPanel");
         _tasksPanel = GetNodeOrNull<Panel>("TasksPanel");
@@ -127,6 +145,8 @@ public partial class GameShell : Control
         _economyPanel = GetNodeOrNull<Panel>("EconomyPanel");
         _diplomacyPanel = GetNodeOrNull<Panel>("DiplomacyPanel");
         _militaryPanel = GetNodeOrNull<Panel>("MilitaryPanel");
+        _eventsPanel = GetNodeOrNull<Panel>("EventsPanel");
+        _achievementsPanel = GetNodeOrNull<Panel>("AchievementsPanel");
 
         var closeCabinet = GetNodeOrNull<Button>("CabinetPanel/VBox/Header/CloseButton");
         if (closeCabinet != null) closeCabinet.Pressed += () => ShowPanel(null);
@@ -142,6 +162,29 @@ public partial class GameShell : Control
 
         var closeMilitary = GetNodeOrNull<Button>("MilitaryPanel/VBox/Header/CloseButton");
         if (closeMilitary != null) closeMilitary.Pressed += () => ShowPanel(null);
+
+        var closeEvents = GetNodeOrNull<Button>("EventsPanel/VBox/Header/CloseButton");
+        if (closeEvents != null) closeEvents.Pressed += () => ShowPanel(null);
+
+        var closeAchievements = GetNodeOrNull<Button>("AchievementsPanel/VBox/Header/CloseButton");
+        if (closeAchievements != null) closeAchievements.Pressed += () => ShowPanel(null);
+
+        _eventsSummaryLabel = GetNodeOrNull<Label>("EventsPanel/VBox/ControlsHBox/EventsSummaryLabel");
+        _markAllReadBtn = GetNodeOrNull<Button>("EventsPanel/VBox/ControlsHBox/MarkAllReadBtn");
+        _eventsList = GetNodeOrNull<VBoxContainer>("EventsPanel/VBox/Scroll/EventsList");
+
+        if (_markAllReadBtn != null)
+        {
+            _markAllReadBtn.Pressed += () =>
+            {
+                _engine.Dispatch(new DismissNotificationCommand(null));
+                RefreshEventsView();
+                RefreshHud();
+            };
+        }
+
+        _achievementsSummaryLabel = GetNodeOrNull<Label>("AchievementsPanel/VBox/AchievementsSummaryLabel");
+        _achievementsList = GetNodeOrNull<VBoxContainer>("AchievementsPanel/VBox/Scroll/AchievementsList");
 
         _diplomacySummaryLabel = GetNodeOrNull<Label>("DiplomacyPanel/VBox/DiplomacySummaryLabel");
         _nationsList = GetNodeOrNull<VBoxContainer>("DiplomacyPanel/VBox/Scroll/NationsList");
@@ -275,6 +318,8 @@ public partial class GameShell : Control
         if (_economyPanel != null) _economyPanel.Visible = (_economyPanel == targetPanel);
         if (_diplomacyPanel != null) _diplomacyPanel.Visible = (_diplomacyPanel == targetPanel);
         if (_militaryPanel != null) _militaryPanel.Visible = (_militaryPanel == targetPanel);
+        if (_eventsPanel != null) _eventsPanel.Visible = (_eventsPanel == targetPanel);
+        if (_achievementsPanel != null) _achievementsPanel.Visible = (_achievementsPanel == targetPanel);
 
         if (targetPanel == _cabinetPanel)
         {
@@ -300,6 +345,16 @@ public partial class GameShell : Control
         {
             _nav.NavigateTo(ScreenRoute.MilitaryAndDefense);
             RefreshMilitaryView();
+        }
+        else if (targetPanel == _eventsPanel)
+        {
+            _nav.NavigateTo(ScreenRoute.EventsNewsfeed);
+            RefreshEventsView();
+        }
+        else if (targetPanel == _achievementsPanel)
+        {
+            _nav.NavigateTo(ScreenRoute.Achievements);
+            RefreshAchievementsView();
         }
         else
         {
@@ -963,6 +1018,208 @@ public partial class GameShell : Control
         }
     }
 
+    private void RefreshEventsView()
+    {
+        var vm = EventHistoryViewModel.FromSession(_session, _activeEventFilter);
+
+        if (_eventsSummaryLabel != null)
+        {
+            _eventsSummaryLabel.Text = vm.HeaderSummary;
+        }
+
+        if (_eventsList == null) return;
+
+        foreach (Node child in _eventsList.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        if (vm.Events.Count == 0)
+        {
+            var emptyLabel = new Label
+            {
+                Text = "No events logged in this category.",
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            _eventsList.AddChild(emptyLabel);
+            return;
+        }
+
+        foreach (var evt in vm.Events)
+        {
+            var card = new PanelContainer();
+            card.CustomMinimumSize = new Vector2(0, 56);
+
+            var hBox = new HBoxContainer();
+            hBox.AddThemeConstantOverride("separation", 12);
+            card.AddChild(hBox);
+
+            var badgeColor = evt.Severity switch
+            {
+                EventSeverity.Critical => Colors.Salmon,
+                EventSeverity.Warning => Colors.Khaki,
+                _ => Colors.LightSkyBlue
+            };
+
+            var badge = new Label
+            {
+                Text = $"[{evt.SeverityBadgeText}]",
+                Modulate = badgeColor
+            };
+            hBox.AddChild(badge);
+
+            var date = new Label
+            {
+                Text = evt.DateText,
+                Modulate = Colors.Gray
+            };
+            hBox.AddChild(date);
+
+            var titleBox = new VBoxContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            var title = new Label
+            {
+                Text = evt.IsRead ? evt.Title : $"● {evt.Title}",
+                Modulate = evt.IsRead ? Colors.Silver : Colors.White
+            };
+            titleBox.AddChild(title);
+
+            var desc = new Label
+            {
+                Text = evt.Message,
+                Modulate = Colors.DarkGray,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart
+            };
+            titleBox.AddChild(desc);
+            hBox.AddChild(titleBox);
+
+            if (evt.ActionRoute.HasValue && !string.IsNullOrEmpty(evt.ActionButtonText))
+            {
+                var jumpBtn = new Button
+                {
+                    Text = evt.ActionButtonText,
+                    CustomMinimumSize = new Vector2(120, 32)
+                };
+                jumpBtn.Pressed += () =>
+                {
+                    switch (evt.ActionRoute.Value)
+                    {
+                        case ScreenRoute.GovernmentCabinet: ShowPanel(_cabinetPanel); break;
+                        case ScreenRoute.TasksAndObjectives: ShowPanel(_tasksPanel); break;
+                        case ScreenRoute.EconomyAndBudget: ShowPanel(_economyPanel); break;
+                        case ScreenRoute.DiplomacyAndTreaties: ShowPanel(_diplomacyPanel); break;
+                        case ScreenRoute.MilitaryAndDefense: ShowPanel(_militaryPanel); break;
+                        case ScreenRoute.Achievements: ShowPanel(_achievementsPanel); break;
+                        default: ShowPanel(null); break;
+                    }
+                };
+                hBox.AddChild(jumpBtn);
+            }
+
+            _eventsList.AddChild(card);
+        }
+    }
+
+    private void RefreshAchievementsView()
+    {
+        var vm = AchievementsViewModel.FromSession(_session);
+
+        if (_achievementsSummaryLabel != null)
+        {
+            _achievementsSummaryLabel.Text = vm.SummaryText;
+        }
+
+        if (_achievementsList == null) return;
+
+        foreach (Node child in _achievementsList.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        foreach (var ach in vm.Achievements)
+        {
+            var card = new PanelContainer();
+            card.CustomMinimumSize = new Vector2(0, 64);
+
+            var hBox = new HBoxContainer();
+            hBox.AddThemeConstantOverride("separation", 16);
+            card.AddChild(hBox);
+
+            var iconLabel = new Label
+            {
+                Text = ach.IsUnlocked ? "★" : "☆",
+                Modulate = ach.IsUnlocked ? Colors.Gold : Colors.DarkGray
+            };
+            hBox.AddChild(iconLabel);
+
+            var infoBox = new VBoxContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            var title = new Label
+            {
+                Text = $"{ach.Title} [{ach.Category}]",
+                Modulate = ach.IsUnlocked ? Colors.Gold : Colors.White
+            };
+            infoBox.AddChild(title);
+
+            var desc = new Label
+            {
+                Text = ach.Description,
+                Modulate = Colors.LightGray,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart
+            };
+            infoBox.AddChild(desc);
+
+            var progressLabel = new Label
+            {
+                Text = $"Progress: {ach.ProgressText}  •  Reward: {ach.RewardText}",
+                Modulate = Colors.Cyan
+            };
+            infoBox.AddChild(progressLabel);
+            hBox.AddChild(infoBox);
+
+            if (ach.CanClaimReward)
+            {
+                var claimBtn = new Button
+                {
+                    Text = "Claim Reward",
+                    CustomMinimumSize = new Vector2(130, 36)
+                };
+                claimBtn.Pressed += () =>
+                {
+                    var player = _session.GetPlayerCountry();
+                    if (player != null)
+                    {
+                        var res = _engine.Dispatch(new ClaimAchievementRewardCommand(ach.Id, player.Id));
+                        if (res.IsSuccess)
+                        {
+                            RefreshAchievementsView();
+                            RefreshHud();
+                        }
+                    }
+                };
+                hBox.AddChild(claimBtn);
+            }
+            else if (ach.IsRewardClaimed)
+            {
+                var claimedLabel = new Label
+                {
+                    Text = "✓ CLAIMED",
+                    Modulate = Colors.LimeGreen,
+                    CustomMinimumSize = new Vector2(100, 36),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                hBox.AddChild(claimedLabel);
+            }
+
+            _achievementsList.AddChild(card);
+        }
+    }
+
     public override void _UnhandledInput(InputEvent @event)
     {
         if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
@@ -1007,6 +1264,14 @@ public partial class GameShell : Control
                     break;
                 case Key.F7:
                     ShowPanel(_militaryPanel);
+                    GetViewport().SetInputAsHandled();
+                    break;
+                case Key.F8:
+                    ShowPanel(_eventsPanel);
+                    GetViewport().SetInputAsHandled();
+                    break;
+                case Key.F10:
+                    ShowPanel(_achievementsPanel);
                     GetViewport().SetInputAsHandled();
                     break;
                 case Key.F5:
@@ -1083,6 +1348,18 @@ public partial class GameShell : Control
             return;
         }
 
+        if (_eventsPanel != null && _eventsPanel.Visible)
+        {
+            ShowPanel(null);
+            return;
+        }
+
+        if (_achievementsPanel != null && _achievementsPanel.Visible)
+        {
+            ShowPanel(null);
+            return;
+        }
+
         if (_nav.CanNavigateBack)
         {
             _nav.NavigateBack();
@@ -1105,6 +1382,20 @@ public partial class GameShell : Control
         if (_livingLabel != null) _livingLabel.Text = $"LIVING: {vm.LivingStandardText}";
         if (_speedLabel != null) _speedLabel.Text = $"[{vm.SpeedText}]";
 
+        var evVm = EventHistoryViewModel.FromSession(_session);
+        if (_btnEvents != null)
+        {
+            _btnEvents.Text = evVm.UnreadCount > 0 ? $"EVT ({evVm.UnreadCount})" : "EVT";
+            _btnEvents.TooltipText = $"F8: News & Alerts ({evVm.UnreadCount} unread)";
+        }
+
+        var achVm = AchievementsViewModel.FromSession(_session);
+        if (_btnAchievements != null)
+        {
+            _btnAchievements.Text = $"ACH ({achVm.UnlockedCount})";
+            _btnAchievements.TooltipText = $"F10: Achievements ({achVm.UnlockedCount}/{achVm.TotalAchievements} Unlocked)";
+        }
+
         var playerCountry = _session.GetPlayerCountry();
         var mapTitle = GetNodeOrNull<Label>("CentralMapPlaceholder/VBox/MapTitle");
         var mapInfo = GetNodeOrNull<Label>("CentralMapPlaceholder/VBox/MapInfo");
@@ -1118,3 +1409,4 @@ public partial class GameShell : Control
         }
     }
 }
+

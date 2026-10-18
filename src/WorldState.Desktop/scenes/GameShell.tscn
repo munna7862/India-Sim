@@ -190,6 +190,18 @@ layout_mode = 2
 tooltip_text = "F7: Armed Forces & Defense"
 text = "MIL"
 
+[node name="BtnEvents" type="Button" parent="LeftNavRail/VBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+tooltip_text = "F8: Newsfeed & Event History"
+text = "EVT"
+
+[node name="BtnAchievements" type="Button" parent="LeftNavRail/VBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+tooltip_text = "F10: Achievements & Milestones"
+text = "ACH"
+
 [node name="FooterBar" type="ColorRect" parent="."]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 1
@@ -633,6 +645,122 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
+
+[node name="EventsPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 72.0
+offset_top = 64.0
+offset_right = -16.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="EventsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="EventsPanel/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="EventsPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "NATIONAL NEWSFEED & EVENT HISTORY"
+
+[node name="CloseButton" type="Button" parent="EventsPanel/VBox/Header"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "✕"
+
+[node name="ControlsHBox" type="HBoxContainer" parent="EventsPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="EventsSummaryLabel" type="Label" parent="EventsPanel/VBox/ControlsHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Event Log: 0 Alerts"
+
+[node name="MarkAllReadBtn" type="Button" parent="EventsPanel/VBox/ControlsHBox"]
+layout_mode = 2
+text = "Mark All Read"
+
+[node name="Scroll" type="ScrollContainer" parent="EventsPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EventsList" type="VBoxContainer" parent="EventsPanel/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="AchievementsPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 72.0
+offset_top = 64.0
+offset_right = -16.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="AchievementsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="AchievementsPanel/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="AchievementsPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "NATIONAL ACHIEVEMENTS & PRESTIGE PROGRESSION"
+
+[node name="CloseButton" type="Button" parent="AchievementsPanel/VBox/Header"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "✕"
+
+[node name="AchievementsSummaryLabel" type="Label" parent="AchievementsPanel/VBox"]
+layout_mode = 2
+text = "Achievements: 0 of 8 Unlocked | Prestige Score: 0 pts"
+
+[node name="Scroll" type="ScrollContainer" parent="AchievementsPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AchievementsList" type="VBoxContainer" parent="AchievementsPanel/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
 
 
 

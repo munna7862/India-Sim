@@ -1,0 +1,90 @@
+{
+  "$schema": "https://raw.githubusercontent.com/munna7862/India-Sim/main/schemas/world_events.schema.json",
+  "version": 1,
+  "events": [
+    {
+      "id": "WEV_GLOBAL_TRADE_BOOM",
+      "title": "Global Trade Expansion",
+      "description": "International shipping demand surges across major sea lanes, increasing global commercial revenues and providing a stimulus to export nations.",
+      "category": "Economy",
+      "severity": "Info",
+      "triggerChance": 0.25,
+      "cooldownMonths": 12,
+      "treasuryImpact": 1500000000,
+      "stabilityImpact": 2.0,
+      "approvalImpact": 3.0,
+      "relationsImpact": 5.0,
+      "actionRoute": "EconomyAndBudget"
+    },
+    {
+      "id": "WEV_ENERGY_CRISIS",
+      "title": "Global Energy Disruption",
+      "description": "Volatility in international petroleum markets triggers price spikes, testing national reserve stability and industrial power supply.",
+      "category": "Economy",
+      "severity": "Warning",
+      "triggerChance": 0.20,
+      "cooldownMonths": 18,
+      "treasuryImpact": -1000000000,
+      "stabilityImpact": -3.0,
+      "approvalImpact": -2.0,
+      "relationsImpact": 0.0,
+      "actionRoute": "EconomyAndBudget"
+    },
+    {
+      "id": "WEV_UN_PEACE_SUMMIT",
+      "title": "Geneva World Peace Accord",
+      "description": "Delegates at the United Nations pass a consensus resolution affirming sovereign non-aggression, fostering international goodwill and diplomatic thaw.",
+      "category": "Diplomacy",
+      "severity": "Info",
+      "triggerChance": 0.20,
+      "cooldownMonths": 15,
+      "treasuryImpact": 0,
+      "stabilityImpact": 4.0,
+      "approvalImpact": 2.0,
+      "relationsImpact": 8.0,
+      "actionRoute": "DiplomacyAndTreaties"
+    },
+    {
+      "id": "WEV_REGIONAL_TENSION",
+      "title": "Cross-Border Military Drills",
+      "description": "Heightened maneuvers along contested strategic frontiers cause neighboring armed forces to elevate readiness alerts.",
+      "category": "Military",
+      "severity": "Warning",
+      "triggerChance": 0.25,
+      "cooldownMonths": 12,
+      "treasuryImpact": -500000000,
+      "stabilityImpact": -2.0,
+      "approvalImpact": 0.0,
+      "relationsImpact": -6.0,
+      "actionRoute": "MilitaryAndDefense"
+    },
+    {
+      "id": "WEV_GLOBAL_PANDEMIC_ALERT",
+      "title": "WHO Respiratory Virus Alert",
+      "description": "An infectious respiratory cluster reported abroad triggers health monitoring protocols across all entry ports and international airports.",
+      "category": "Emergency",
+      "severity": "Critical",
+      "triggerChance": 0.15,
+      "cooldownMonths": 24,
+      "treasuryImpact": -2000000000,
+      "stabilityImpact": -4.0,
+      "approvalImpact": -3.0,
+      "relationsImpact": -2.0,
+      "actionRoute": "GovernmentCabinet"
+    },
+    {
+      "id": "WEV_SCIENTIFIC_BREAKTHROUGH",
+      "title": "Breakthrough in Clean Fusion Energy",
+      "description": "An international consortium announces experimental net-positive fusion energy milestones, uplifting public confidence and scientific optimism.",
+      "category": "Economy",
+      "severity": "Info",
+      "triggerChance": 0.15,
+      "cooldownMonths": 20,
+      "treasuryImpact": 500000000,
+      "stabilityImpact": 3.0,
+      "approvalImpact": 4.0,
+      "relationsImpact": 3.0,
+      "actionRoute": "EconomyAndBudget"
+    }
+  ]
+}

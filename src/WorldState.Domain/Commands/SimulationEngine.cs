@@ -17,8 +17,9 @@ public class SimulationEngine
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _session.PolicyRegistry ??= Economy.EconomicPolicyRegistry.CreateDefaultCatalog();
         _session.MilitaryRegistry ??= Military.MilitaryUnitRegistry.CreateDefaultCatalog();
+        _session.AchievementRegistry ??= Achievements.AchievementRegistry.CreateDefaultCatalog();
+        _session.WorldEventRegistry ??= Events.WorldEventRegistry.CreateDefaultCatalog();
         WireClockEvents();
-
     }
 
     private void WireClockEvents()
@@ -123,6 +124,30 @@ public class SimulationEngine
         }
     }
 
+    private Achievements.AchievementRegistry? _achievementRegistry;
+
+    public Achievements.AchievementRegistry AchievementRegistry
+    {
+        get => _achievementRegistry ??= _session.AchievementRegistry ?? Achievements.AchievementRegistry.CreateDefaultCatalog();
+        set
+        {
+            _achievementRegistry = value;
+            _session.AchievementRegistry = value;
+        }
+    }
+
+    private Events.WorldEventRegistry? _worldEventRegistry;
+
+    public Events.WorldEventRegistry WorldEventRegistry
+    {
+        get => _worldEventRegistry ??= _session.WorldEventRegistry ?? Events.WorldEventRegistry.CreateDefaultCatalog();
+        set
+        {
+            _worldEventRegistry = value;
+            _session.WorldEventRegistry = value;
+        }
+    }
+
     private void HandleMonthPassed(DateOnly newDate)
     {
         // 1. Execute invariant monthly ledger across all countries
@@ -138,8 +163,14 @@ public class SimulationEngine
         // 2. Process domestic events
         ProcessDomesticEvents(newDate);
 
-        // 3. Evaluate tasks against authoritative world state
+        // 3. Process world events
+        ProcessWorldEvents(newDate);
+
+        // 4. Evaluate tasks against authoritative world state
         EvaluateTasks();
+
+        // 5. Evaluate achievements
+        EvaluateAchievements();
 
         OnMonthRollover?.Invoke(newDate);
     }
@@ -345,6 +376,84 @@ public class SimulationEngine
                         ));
                     }
                 }
+            }
+        }
+    }
+
+    public void ProcessWorldEvents(DateOnly newDate)
+    {
+        var playerCountry = _session.GetPlayerCountry();
+        if (playerCountry == null) return;
+
+        int monthIndex = (newDate.Year * 12) + newDate.Month;
+        var rng = new Random(_session.Seed + (monthIndex * 37) + 11);
+
+        foreach (var evtDef in WorldEventRegistry.Events)
+        {
+            int cd = _session.EventCooldowns.GetValueOrDefault(evtDef.Id, 0);
+            if (cd <= 0 && rng.NextDouble() < evtDef.TriggerChance)
+            {
+                evtDef.ApplyEffects(_session, playerCountry);
+                _session.EventCooldowns[evtDef.Id] = evtDef.CooldownMonths;
+
+                var cat = Enum.TryParse<EventCategory>(evtDef.Category, true, out var c) ? c : EventCategory.World;
+                var sev = Enum.TryParse<EventSeverity>(evtDef.Severity, true, out var s) ? s : EventSeverity.Info;
+                var route = !string.IsNullOrEmpty(evtDef.ActionRoute) && Enum.TryParse<Navigation.ScreenRoute>(evtDef.ActionRoute, true, out var r) ? (Navigation.ScreenRoute?)r : null;
+
+                _session.AddEvent(new GameEvent(
+                    Id: Guid.NewGuid().ToString("N"),
+                    Date: newDate,
+                    Title: evtDef.Title,
+                    Message: evtDef.Description,
+                    Category: cat,
+                    Severity: sev,
+                    ActorCountryId: playerCountry.Id,
+                    ActionRoute: route,
+                    IsRead: false
+                ));
+
+                break; // Max 1 major world event per month
+            }
+        }
+    }
+
+    public void EvaluateAchievements()
+    {
+        var playerCountry = _session.GetPlayerCountry();
+        if (playerCountry == null) return;
+
+        foreach (var def in AchievementRegistry.Achievements)
+        {
+            if (!_session.Achievements.TryGetValue(def.Id, out var progress))
+            {
+                progress = new AchievementProgress
+                {
+                    AchievementId = def.Id,
+                    IsUnlocked = false,
+                    ProgressPercent = 0.0
+                };
+                _session.Achievements[def.Id] = progress;
+            }
+
+            var (isMet, percent) = def.Evaluate(playerCountry, _session);
+            progress.ProgressPercent = percent;
+
+            if (isMet && !progress.IsUnlocked)
+            {
+                progress.IsUnlocked = true;
+                progress.UnlockedDate = _session.Clock.CurrentDate;
+
+                _session.AddEvent(new GameEvent(
+                    Id: Guid.NewGuid().ToString("N"),
+                    Date: _session.Clock.CurrentDate,
+                    Title: $"Achievement Unlocked: {def.Title}",
+                    Message: $"Milestone achieved! '{def.Title}': {def.Description}. Claim reward in the Achievements menu.",
+                    Category: EventCategory.Achievements,
+                    Severity: EventSeverity.Info,
+                    ActorCountryId: playerCountry.Id,
+                    ActionRoute: Navigation.ScreenRoute.Achievements,
+                    IsRead: false
+                ));
             }
         }
     }
