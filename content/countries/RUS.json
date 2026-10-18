@@ -1,0 +1,20 @@
+{
+  "id": "RUS",
+  "name": "Russian Federation",
+  "capital": "Moscow",
+  "isPlayable": true,
+  "startingTreasury": 45000000000.0,
+  "startingPopulation": 144000000,
+  "startingApproval": 68.0,
+  "startingQualityOfLiving": 62.0,
+  "startingStability": 72.0,
+  "incomeTaxRate": 0.13,
+  "corporateTaxRate": 0.20,
+  "vatRate": 0.20,
+  "facilities": {
+    "Farms": 45,
+    "Mines": 60,
+    "PowerPlants": 50,
+    "Factories": 50
+  }
+}

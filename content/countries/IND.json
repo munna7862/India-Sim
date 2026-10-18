@@ -1,6 +1,8 @@
 {
   "id": "IND",
   "name": "Republic of India",
+  "capital": "New Delhi",
+  "isPlayable": true,
   "startingTreasury": 50000000000.0,
   "startingPopulation": 1400000000,
   "startingApproval": 65.0,
