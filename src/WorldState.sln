@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldState.Domain.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentValidator", "..\tools\ContentValidator\ContentValidator.csproj", "{F10A0AE8-07A3-4B97-BC5C-F1DC2188EC9E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldState.Desktop", "WorldState.Desktop\WorldState.Desktop.csproj", "{86A65C34-5974-4EDA-B56F-3278B5278A54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{F10A0AE8-07A3-4B97-BC5C-F1DC2188EC9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F10A0AE8-07A3-4B97-BC5C-F1DC2188EC9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F10A0AE8-07A3-4B97-BC5C-F1DC2188EC9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86A65C34-5974-4EDA-B56F-3278B5278A54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86A65C34-5974-4EDA-B56F-3278B5278A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86A65C34-5974-4EDA-B56F-3278B5278A54}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{86A65C34-5974-4EDA-B56F-3278B5278A54}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -27,7 +27,7 @@ Execute Sprint 02-02 (World map interaction and selection): prepare the world ma
 | 00-03 | Completed | `src/WorldState.sln`, `src/WorldState.Domain/`, `src/WorldState.Domain.Tests/` (11/11 tests pass), `docs/specs/V1-PARITY-SPECIFICATION.md` |
 | 01-01 | Completed | `.github/workflows/ci.yml`, `.editorconfig`, `build.ps1`, `tools/ContentValidator/`, `docs/adr/ADR-003-toolchain-and-ci.md`, `README.md` |
 | 01-02 | Completed | `docs/design/DESKTOP-UI-DESIGN-SYSTEM.md`, `docs/design/UI-WIREFRAMES.md`, `src/WorldState.Domain/ViewModels/` (23/23 tests pass) |
-| 01-03 | Completed | `src/WorldState.Domain/Navigation/`, `src/WorldState.Domain/Settings/`, `src/WorldState.Domain.Tests/NavigationAndSettingsTests.cs` (29/29 tests pass) |
+| 01-03 | Completed | `src/WorldState.Desktop/` (Godot 4 .NET client), `src/WorldState.Domain/Navigation/`, `src/WorldState.Domain/Settings/`, `src/WorldState.Domain.Tests/NavigationAndSettingsTests.cs` (29/29 tests pass) |
 | 02-01 | Completed | `src/WorldState.Domain/Data/`, `content/countries/` (6 verified countries), `src/WorldState.Domain.Tests/CountryRegistryTests.cs` (40/40 tests pass) |
 | 02-02 | Ready / Next | `plans/sprints/02-02.md` |
 | 02-03 | Not started | None |
